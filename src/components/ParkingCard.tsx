@@ -1,6 +1,8 @@
 // src/components/ParkingCard.tsx
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
+
+const { width } = Dimensions.get('window');
 
 interface ParkingCardProps {
   item: {
@@ -8,7 +10,7 @@ interface ParkingCardProps {
     name: string;
     address: string;
     rating: number;
-    imageUrl: any; // Sử dụng 'any' cho require
+    imageUrl: any;
   };
   onPress: () => void;
 }
@@ -29,23 +31,23 @@ const ParkingCard = ({ item, onPress }: ParkingCardProps) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
-    borderRadius: 10,
-    width: 220,
+    borderRadius: 12,
+    width: width * 0.6, // Chiều rộng bằng 60% chiều rộng màn hình
     marginRight: 15,
-    elevation: 3,
+    elevation: 4, // Tăng đổ bóng
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   image: {
     width: '100%',
     height: 120,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
   },
   infoContainer: {
-    padding: 10,
+    padding: 12,
   },
   name: {
     fontSize: 16,
@@ -53,8 +55,8 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   address: {
-    fontSize: 12,
-    color: '#777',
+    fontSize: 13, // Tăng kích thước font
+    color: '#666', // Màu chữ xám hơn
     marginVertical: 4,
   },
   rating: {

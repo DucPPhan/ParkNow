@@ -8,7 +8,7 @@ import Button from '../components/Button';
 
 type RootStackParamList = {
   Login: undefined;
-  Home: undefined;
+  MainApp: undefined;
 };
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
@@ -24,7 +24,7 @@ const LoginScreen = ({ navigation }: Props) => {
 
       <Button
         title="Đăng nhập"
-        onPress={() => navigation.navigate('Home')}
+        onPress={() => navigation.navigate('MainApp')}
         backgroundColor="#3498db"
         textColor="#ffffff"
       />

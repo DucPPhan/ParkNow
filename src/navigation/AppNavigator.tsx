@@ -2,28 +2,23 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { RootStackParamList } from './types'; // Import từ file types
 
-// Import các màn hình của bạn ở đây (chúng ta sẽ tạo chúng ngay sau đây)
-import HomeScreen from '../screens/HomeScreen';
 import LoginScreen from '../screens/LoginScreen';
+import MainTabNavigator from './MainTabNavigator';
+import ParkingListScreen from '../screens/ParkingListScreen';
+import ParkingDetailScreen from '../screens/ParkingDetailScreen';
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<RootStackParamList>(); // Sử dụng kiểu ở đây
 
 const AppNavigator = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen 
-          name="Login" 
-          component={LoginScreen} 
-          options={{ headerShown: false }} // Ẩn header cho màn hình Login
-        />
-        <Stack.Screen 
-          name="Home" 
-          component={HomeScreen} 
-          options={{ title: 'Trang chủ ParkNow' }} // Đặt tiêu đề cho màn hình Home
-        />
-        {/* Thêm các màn hình khác của bạn ở đây */}
+        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="MainApp" component={MainTabNavigator} options={{ headerShown: false }} />
+        <Stack.Screen name="ParkingList" component={ParkingListScreen} options={({ route }) => ({ title: route.params.title })} />
+        <Stack.Screen name="ParkingDetail" component={ParkingDetailScreen} options={({ route }) => ({ title: route.params.name })} />
       </Stack.Navigator>
     </NavigationContainer>
   );
