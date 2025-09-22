@@ -1,0 +1,141 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/icon/bike.svg",
+      "sha1": "112ef29c23983e20150f89af360778d9447da230"
+    },
+    {
+      "path": "src/assets/icon/bike_slot.svg",
+      "sha1": "516931cdb1bc0393f315b413703fb817b0007691"
+    },
+    {
+      "path": "src/assets/icon/calendar.svg",
+      "sha1": "40664d05013f1d4a26b0f0d35cdbfbf867c9f66b"
+    },
+    {
+      "path": "src/assets/icon/calendar_selected.svg",
+      "sha1": "a8b8b758ef990dda2e50b596d0423c7d02807892"
+    },
+    {
+      "path": "src/assets/icon/car.svg",
+      "sha1": "a9d446d48436112bfd8643ca1e1a4c081462f673"
+    },
+    {
+      "path": "src/assets/icon/car_cancel.svg",
+      "sha1": "032ec7cfa0e520a412f23e5521c6562e99e51034"
+    },
+    {
+      "path": "src/assets/icon/car_slot.svg",
+      "sha1": "24b898e067df14d980bd2b6165138592c9b6751f"
+    },
+    {
+      "path": "src/assets/icon/car_sucess.svg",
+      "sha1": "c2ce8905474f2ea15b61c82440428df036a48d6a"
+    },
+    {
+      "path": "src/assets/icon/check.svg",
+      "sha1": "0e766f623bad4bc52857414544c81c761e40668a"
+    },
+    {
+      "path": "src/assets/icon/home.svg",
+      "sha1": "d7fbf4046bb88caaed139f820d7ceb9235a90e2f"
+    },
+    {
+      "path": "src/assets/icon/home_selected.svg",
+      "sha1": "f5cdc104159d792d87121991c3f79d070035e185"
+    },
+    {
+      "path": "src/assets/icon/hourglass.svg",
+      "sha1": "a666c16aed781cce77cecfd08271c68fe6b3ddbb"
+    },
+    {
+      "path": "src/assets/icon/hourglassdetail.svg",
+      "sha1": "21828489cdd43746e0689345bfcbd2c3e9119996"
+    },
+    {
+      "path": "src/assets/icon/location.svg",
+      "sha1": "354d112d57b56c10e335954b5330fbe6c92c7d45"
+    },
+    {
+      "path": "src/assets/icon/map-pin-selected.svg",
+      "sha1": "ec3d5be3490d123b43ba4089fbbe26101850ee9b"
+    },
+    {
+      "path": "src/assets/icon/map-pin.svg",
+      "sha1": "de18f1c245a2e7138663659742b4348262b3bd53"
+    },
+    {
+      "path": "src/assets/icon/notification.svg",
+      "sha1": "011543b1ae4839a2a66913d6b0cca222d18f42e1"
+    },
+    {
+      "path": "src/assets/icon/pmarker.png",
+      "sha1": "8d826e98c7e5a6df04a3aea08410513a0f698ddb"
+    },
+    {
+      "path": "src/assets/icon/user.svg",
+      "sha1": "6ddb9fbb39124606040c5d16d4d648d7c245692f"
+    },
+    {
+      "path": "src/assets/icon/user_selected.svg",
+      "sha1": "33552f1053ba04b77911f23c6e6c34e87b9f0ba9"
+    },
+    {
+      "path": "src/assets/icon/wallet_nap_icon.svg",
+      "sha1": "25a5bb105a0287e41955886071d045b49da81105"
+    },
+    {
+      "path": "src/assets/icon/wallet_rut_icon.svg",
+      "sha1": "e311ced10c6b54fa8968b72dcc52eba93cfa60ac"
+    },
+    {
+      "path": "src/assets/image/cardback.png",
+      "sha1": "ab237e7a25cd3f7d048ef99fb79764fc5e730c34"
+    },
+    {
+      "path": "src/assets/image/car_selected_bg.png",
+      "sha1": "66e3b63c5092db35f0e9db829db166105354a71e"
+    },
+    {
+      "path": "src/assets/image/cmnd_back.png",
+      "sha1": "2ef412881d00290a04e6bc7cad981dec79d15c8a"
+    },
+    {
+      "path": "src/assets/image/cmnd_front.png",
+      "sha1": "30a53de2ac2f1d0107219c0776bbe67c431fa6d5"
+    },
+    {
+      "path": "src/assets/image/home_banner.png",
+      "sha1": "ac2928fef474db29d6470446a152515cd636ed94"
+    },
+    {
+      "path": "src/assets/image/splash1.svg",
+      "sha1": "364d0d29f5445fadfe35252b81c39565b1b263be"
+    },
+    {
+      "path": "src/assets/image/splash2.svg",
+      "sha1": "7b03d7f20c64065f12fc9552f5534567f8aaf977"
+    },
+    {
+      "path": "src/assets/image/splash3.svg",
+      "sha1": "a382212144b4e416e918a7ee80cefceee472c16f"
+    },
+    {
+      "path": "src/assets/json/empty/629-empty-box.json",
+      "sha1": "bf9659f85bd9fa2fd7f4c469666a69d9961e9c9b"
+    },
+    {
+      "path": "src/assets/json/inactiveuser/data.json",
+      "sha1": "3eb76e32a738f743ac10edc7720583eb887b0f58"
+    },
+    {
+      "path": "src/assets/json/loading/96949-loading-animation.json",
+      "sha1": "8e65f9acd2d25bc42b95293d5747f6db6b7b6b98"
+    },
+    {
+      "path": "src/assets/logo/parkz.png",
+      "sha1": "8e2337c1d6c0d570a2994f86584f7701179edbd9"
+    }
+  ]
+}

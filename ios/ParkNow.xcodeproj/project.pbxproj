@@ -1,0 +1,616 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0C80B921A6F3F58F76C31292 /* libPods-ParkNow.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-ParkNow.a */; };
+		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
+		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		8FECDF5EF56C4373A99D7867 /* bike.svg in Resources */ = {isa = PBXBuildFile; fileRef = 3782611EE0674A48B7F810C6 /* bike.svg */; };
+		B44A0DDAC08F42E48D9C5FCC /* bike_slot.svg in Resources */ = {isa = PBXBuildFile; fileRef = 1F3A27001EDF4AEF8C11CE9E /* bike_slot.svg */; };
+		81C18990E628498682A8469C /* calendar.svg in Resources */ = {isa = PBXBuildFile; fileRef = 83ADAE9A763047E1BBE3731D /* calendar.svg */; };
+		11B5ECD9E0654667A97491FD /* calendar_selected.svg in Resources */ = {isa = PBXBuildFile; fileRef = 084F8A4CA474494897EB69FB /* calendar_selected.svg */; };
+		59B853CDB0464981958E6504 /* car.svg in Resources */ = {isa = PBXBuildFile; fileRef = 0A8C5C0CF96B4175A0CC852B /* car.svg */; };
+		E3EC46FB90164AFDBE1149CC /* car_cancel.svg in Resources */ = {isa = PBXBuildFile; fileRef = D58F2522119544BDBD3B9500 /* car_cancel.svg */; };
+		4038BD18321B4757AE164EEB /* car_slot.svg in Resources */ = {isa = PBXBuildFile; fileRef = 16D70D52C46044CDBC8027CC /* car_slot.svg */; };
+		B53B7E41700C4C3494958B3D /* car_sucess.svg in Resources */ = {isa = PBXBuildFile; fileRef = 88CC1D4DF9674F7897F8A793 /* car_sucess.svg */; };
+		2E75501C933E4B70AC1B5B54 /* check.svg in Resources */ = {isa = PBXBuildFile; fileRef = 1EC70FB896B74CBF8AE06A3D /* check.svg */; };
+		17638BFD74854F76933DF0B9 /* home.svg in Resources */ = {isa = PBXBuildFile; fileRef = 274030D866C8480280185E73 /* home.svg */; };
+		0B6D2E2795CE41FBAB4AA049 /* home_selected.svg in Resources */ = {isa = PBXBuildFile; fileRef = 1D7133F064834BA0B72D4CBF /* home_selected.svg */; };
+		17601F7F51D348B784140ECC /* hourglass.svg in Resources */ = {isa = PBXBuildFile; fileRef = BAD86ABBC0BB4A0AB4DCA9E8 /* hourglass.svg */; };
+		AA71069502A6463AB6371ADA /* hourglassdetail.svg in Resources */ = {isa = PBXBuildFile; fileRef = 35897BE7D4414809B901EDF6 /* hourglassdetail.svg */; };
+		013A85B83FC14B56B5C97F9B /* location.svg in Resources */ = {isa = PBXBuildFile; fileRef = 4577835674E84805822381CE /* location.svg */; };
+		734C23946C5E4B798F3AB829 /* map-pin-selected.svg in Resources */ = {isa = PBXBuildFile; fileRef = 687A3F42A9B5403FB7413C17 /* map-pin-selected.svg */; };
+		97CEE4EB28E4430B80A5A817 /* map-pin.svg in Resources */ = {isa = PBXBuildFile; fileRef = A1379A2B85624A109C65BD2F /* map-pin.svg */; };
+		E0A6E71671CC44AA86709C65 /* notification.svg in Resources */ = {isa = PBXBuildFile; fileRef = 856E0D122F654CFC8D398EC3 /* notification.svg */; };
+		610E0FB57DAD4111B49BF82B /* pmarker.png in Resources */ = {isa = PBXBuildFile; fileRef = 10D2ECE8A9764D79B9D9F72D /* pmarker.png */; };
+		D49F041F380B427A850B9AAD /* user.svg in Resources */ = {isa = PBXBuildFile; fileRef = A1628F67A03241A88A3AC0C0 /* user.svg */; };
+		6C6E68F05EBD45A4858EDF64 /* user_selected.svg in Resources */ = {isa = PBXBuildFile; fileRef = 5ED97F95228D42A5AA7C8D67 /* user_selected.svg */; };
+		72079031C01A4325BD435862 /* wallet_nap_icon.svg in Resources */ = {isa = PBXBuildFile; fileRef = FAB5F30407654BC28511B249 /* wallet_nap_icon.svg */; };
+		B59C8C32B9294C78924B4C01 /* wallet_rut_icon.svg in Resources */ = {isa = PBXBuildFile; fileRef = ACE0ACBA97174428B6A6410E /* wallet_rut_icon.svg */; };
+		89D27F6042B44B1FA32F26C1 /* cardback.png in Resources */ = {isa = PBXBuildFile; fileRef = EEE1A6AEE0EF468CB505D86D /* cardback.png */; };
+		BAB09300843C4BC984C95BC8 /* car_selected_bg.png in Resources */ = {isa = PBXBuildFile; fileRef = 8639CE72B7E649DD836CACBE /* car_selected_bg.png */; };
+		DBC4B9E06C484BF28F1175FE /* cmnd_back.png in Resources */ = {isa = PBXBuildFile; fileRef = 9014D8FD321F4EFA9CE912CB /* cmnd_back.png */; };
+		0562E62C44FC40DEA398DC7E /* cmnd_front.png in Resources */ = {isa = PBXBuildFile; fileRef = 1E48DFD1E74643D8A0BBA3B1 /* cmnd_front.png */; };
+		D9C49DED40844E9E9BBB1551 /* home_banner.png in Resources */ = {isa = PBXBuildFile; fileRef = D6EBFF356F0F483D98187A58 /* home_banner.png */; };
+		145065E16CAC4B6D98F2B926 /* splash1.svg in Resources */ = {isa = PBXBuildFile; fileRef = 35D1DA57A1FA41B2B0935F78 /* splash1.svg */; };
+		2C4889E890B24606BB04E6CC /* splash2.svg in Resources */ = {isa = PBXBuildFile; fileRef = F54ACE97A0AF471591EC6643 /* splash2.svg */; };
+		C49100BB5B6845BBB408D96A /* splash3.svg in Resources */ = {isa = PBXBuildFile; fileRef = A35F8E66A9A34B6F87AA62FD /* splash3.svg */; };
+		E7F8E374D6D348B9AE9D6A53 /* 629-empty-box.json in Resources */ = {isa = PBXBuildFile; fileRef = 9E4BF2B62C34486B9EF14F01 /* 629-empty-box.json */; };
+		AEAC5DDD80CA4887B58AA1D5 /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = 13A9EEA527B34FCA87E45DCE /* data.json */; };
+		A8D6923F821F47F7AD126EE4 /* 96949-loading-animation.json in Resources */ = {isa = PBXBuildFile; fileRef = 0167D18AFDE347C8A6808D52 /* 96949-loading-animation.json */; };
+		53B3A8FDD5A3438291FDB930 /* parkz.png in Resources */ = {isa = PBXBuildFile; fileRef = C77BF8C696154EFE8EF0BD39 /* parkz.png */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		13B07F961A680F5B00A75B9A /* ParkNow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ParkNow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ParkNow/Images.xcassets; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ParkNow/Info.plist; sourceTree = "<group>"; };
+		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = ParkNow/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		3B4392A12AC88292D35C810B /* Pods-ParkNow.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ParkNow.debug.xcconfig"; path = "Target Support Files/Pods-ParkNow/Pods-ParkNow.debug.xcconfig"; sourceTree = "<group>"; };
+		5709B34CF0A7D63546082F79 /* Pods-ParkNow.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ParkNow.release.xcconfig"; path = "Target Support Files/Pods-ParkNow/Pods-ParkNow.release.xcconfig"; sourceTree = "<group>"; };
+		5DCACB8F33CDC322A6C60F78 /* libPods-ParkNow.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ParkNow.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = ParkNow/AppDelegate.swift; sourceTree = "<group>"; };
+		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ParkNow/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		3782611EE0674A48B7F810C6 /* bike.svg */ = {isa = PBXFileReference; name = "bike.svg"; path = "../src/assets/icon/bike.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		1F3A27001EDF4AEF8C11CE9E /* bike_slot.svg */ = {isa = PBXFileReference; name = "bike_slot.svg"; path = "../src/assets/icon/bike_slot.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		83ADAE9A763047E1BBE3731D /* calendar.svg */ = {isa = PBXFileReference; name = "calendar.svg"; path = "../src/assets/icon/calendar.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		084F8A4CA474494897EB69FB /* calendar_selected.svg */ = {isa = PBXFileReference; name = "calendar_selected.svg"; path = "../src/assets/icon/calendar_selected.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		0A8C5C0CF96B4175A0CC852B /* car.svg */ = {isa = PBXFileReference; name = "car.svg"; path = "../src/assets/icon/car.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		D58F2522119544BDBD3B9500 /* car_cancel.svg */ = {isa = PBXFileReference; name = "car_cancel.svg"; path = "../src/assets/icon/car_cancel.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		16D70D52C46044CDBC8027CC /* car_slot.svg */ = {isa = PBXFileReference; name = "car_slot.svg"; path = "../src/assets/icon/car_slot.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		88CC1D4DF9674F7897F8A793 /* car_sucess.svg */ = {isa = PBXFileReference; name = "car_sucess.svg"; path = "../src/assets/icon/car_sucess.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		1EC70FB896B74CBF8AE06A3D /* check.svg */ = {isa = PBXFileReference; name = "check.svg"; path = "../src/assets/icon/check.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		274030D866C8480280185E73 /* home.svg */ = {isa = PBXFileReference; name = "home.svg"; path = "../src/assets/icon/home.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		1D7133F064834BA0B72D4CBF /* home_selected.svg */ = {isa = PBXFileReference; name = "home_selected.svg"; path = "../src/assets/icon/home_selected.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		BAD86ABBC0BB4A0AB4DCA9E8 /* hourglass.svg */ = {isa = PBXFileReference; name = "hourglass.svg"; path = "../src/assets/icon/hourglass.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		35897BE7D4414809B901EDF6 /* hourglassdetail.svg */ = {isa = PBXFileReference; name = "hourglassdetail.svg"; path = "../src/assets/icon/hourglassdetail.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		4577835674E84805822381CE /* location.svg */ = {isa = PBXFileReference; name = "location.svg"; path = "../src/assets/icon/location.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		687A3F42A9B5403FB7413C17 /* map-pin-selected.svg */ = {isa = PBXFileReference; name = "map-pin-selected.svg"; path = "../src/assets/icon/map-pin-selected.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		A1379A2B85624A109C65BD2F /* map-pin.svg */ = {isa = PBXFileReference; name = "map-pin.svg"; path = "../src/assets/icon/map-pin.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		856E0D122F654CFC8D398EC3 /* notification.svg */ = {isa = PBXFileReference; name = "notification.svg"; path = "../src/assets/icon/notification.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		10D2ECE8A9764D79B9D9F72D /* pmarker.png */ = {isa = PBXFileReference; name = "pmarker.png"; path = "../src/assets/icon/pmarker.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		A1628F67A03241A88A3AC0C0 /* user.svg */ = {isa = PBXFileReference; name = "user.svg"; path = "../src/assets/icon/user.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		5ED97F95228D42A5AA7C8D67 /* user_selected.svg */ = {isa = PBXFileReference; name = "user_selected.svg"; path = "../src/assets/icon/user_selected.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		FAB5F30407654BC28511B249 /* wallet_nap_icon.svg */ = {isa = PBXFileReference; name = "wallet_nap_icon.svg"; path = "../src/assets/icon/wallet_nap_icon.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		ACE0ACBA97174428B6A6410E /* wallet_rut_icon.svg */ = {isa = PBXFileReference; name = "wallet_rut_icon.svg"; path = "../src/assets/icon/wallet_rut_icon.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		EEE1A6AEE0EF468CB505D86D /* cardback.png */ = {isa = PBXFileReference; name = "cardback.png"; path = "../src/assets/image/cardback.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		8639CE72B7E649DD836CACBE /* car_selected_bg.png */ = {isa = PBXFileReference; name = "car_selected_bg.png"; path = "../src/assets/image/car_selected_bg.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		9014D8FD321F4EFA9CE912CB /* cmnd_back.png */ = {isa = PBXFileReference; name = "cmnd_back.png"; path = "../src/assets/image/cmnd_back.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		1E48DFD1E74643D8A0BBA3B1 /* cmnd_front.png */ = {isa = PBXFileReference; name = "cmnd_front.png"; path = "../src/assets/image/cmnd_front.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		D6EBFF356F0F483D98187A58 /* home_banner.png */ = {isa = PBXFileReference; name = "home_banner.png"; path = "../src/assets/image/home_banner.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		35D1DA57A1FA41B2B0935F78 /* splash1.svg */ = {isa = PBXFileReference; name = "splash1.svg"; path = "../src/assets/image/splash1.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		F54ACE97A0AF471591EC6643 /* splash2.svg */ = {isa = PBXFileReference; name = "splash2.svg"; path = "../src/assets/image/splash2.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		A35F8E66A9A34B6F87AA62FD /* splash3.svg */ = {isa = PBXFileReference; name = "splash3.svg"; path = "../src/assets/image/splash3.svg"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		9E4BF2B62C34486B9EF14F01 /* 629-empty-box.json */ = {isa = PBXFileReference; name = "629-empty-box.json"; path = "../src/assets/json/empty/629-empty-box.json"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		13A9EEA527B34FCA87E45DCE /* data.json */ = {isa = PBXFileReference; name = "data.json"; path = "../src/assets/json/inactiveuser/data.json"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		0167D18AFDE347C8A6808D52 /* 96949-loading-animation.json */ = {isa = PBXFileReference; name = "96949-loading-animation.json"; path = "../src/assets/json/loading/96949-loading-animation.json"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		C77BF8C696154EFE8EF0BD39 /* parkz.png */ = {isa = PBXFileReference; name = "parkz.png"; path = "../src/assets/logo/parkz.png"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		13B07F8C1A680F5B00A75B9A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C80B921A6F3F58F76C31292 /* libPods-ParkNow.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		13B07FAE1A68108700A75B9A /* ParkNow */ = {
+			isa = PBXGroup;
+			children = (
+				13B07FB51A68108700A75B9A /* Images.xcassets */,
+				761780EC2CA45674006654EE /* AppDelegate.swift */,
+				13B07FB61A68108700A75B9A /* Info.plist */,
+				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
+				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
+			);
+			name = ParkNow;
+			sourceTree = "<group>";
+		};
+		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
+				5DCACB8F33CDC322A6C60F78 /* libPods-ParkNow.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Libraries;
+			sourceTree = "<group>";
+		};
+		83CBB9F61A601CBA00E9B192 = {
+			isa = PBXGroup;
+			children = (
+				13B07FAE1A68108700A75B9A /* ParkNow */,
+				832341AE1AAA6A7D00B99B32 /* Libraries */,
+				83CBBA001A601CBA00E9B192 /* Products */,
+				2D16E6871FA4F8E400B85C8A /* Frameworks */,
+				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				2588E8860514439A8A609789 /* Resources */,
+			);
+			indentWidth = 2;
+			sourceTree = "<group>";
+			tabWidth = 2;
+			usesTabs = 0;
+		};
+		83CBBA001A601CBA00E9B192 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				13B07F961A680F5B00A75B9A /* ParkNow.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				3B4392A12AC88292D35C810B /* Pods-ParkNow.debug.xcconfig */,
+				5709B34CF0A7D63546082F79 /* Pods-ParkNow.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		2588E8860514439A8A609789 /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				3782611EE0674A48B7F810C6 /* bike.svg */,
+				1F3A27001EDF4AEF8C11CE9E /* bike_slot.svg */,
+				83ADAE9A763047E1BBE3731D /* calendar.svg */,
+				084F8A4CA474494897EB69FB /* calendar_selected.svg */,
+				0A8C5C0CF96B4175A0CC852B /* car.svg */,
+				D58F2522119544BDBD3B9500 /* car_cancel.svg */,
+				16D70D52C46044CDBC8027CC /* car_slot.svg */,
+				88CC1D4DF9674F7897F8A793 /* car_sucess.svg */,
+				1EC70FB896B74CBF8AE06A3D /* check.svg */,
+				274030D866C8480280185E73 /* home.svg */,
+				1D7133F064834BA0B72D4CBF /* home_selected.svg */,
+				BAD86ABBC0BB4A0AB4DCA9E8 /* hourglass.svg */,
+				35897BE7D4414809B901EDF6 /* hourglassdetail.svg */,
+				4577835674E84805822381CE /* location.svg */,
+				687A3F42A9B5403FB7413C17 /* map-pin-selected.svg */,
+				A1379A2B85624A109C65BD2F /* map-pin.svg */,
+				856E0D122F654CFC8D398EC3 /* notification.svg */,
+				10D2ECE8A9764D79B9D9F72D /* pmarker.png */,
+				A1628F67A03241A88A3AC0C0 /* user.svg */,
+				5ED97F95228D42A5AA7C8D67 /* user_selected.svg */,
+				FAB5F30407654BC28511B249 /* wallet_nap_icon.svg */,
+				ACE0ACBA97174428B6A6410E /* wallet_rut_icon.svg */,
+				EEE1A6AEE0EF468CB505D86D /* cardback.png */,
+				8639CE72B7E649DD836CACBE /* car_selected_bg.png */,
+				9014D8FD321F4EFA9CE912CB /* cmnd_back.png */,
+				1E48DFD1E74643D8A0BBA3B1 /* cmnd_front.png */,
+				D6EBFF356F0F483D98187A58 /* home_banner.png */,
+				35D1DA57A1FA41B2B0935F78 /* splash1.svg */,
+				F54ACE97A0AF471591EC6643 /* splash2.svg */,
+				A35F8E66A9A34B6F87AA62FD /* splash3.svg */,
+				9E4BF2B62C34486B9EF14F01 /* 629-empty-box.json */,
+				13A9EEA527B34FCA87E45DCE /* data.json */,
+				0167D18AFDE347C8A6808D52 /* 96949-loading-animation.json */,
+				C77BF8C696154EFE8EF0BD39 /* parkz.png */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		13B07F861A680F5B00A75B9A /* ParkNow */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ParkNow" */;
+			buildPhases = (
+				C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */,
+				13B07F871A680F5B00A75B9A /* Sources */,
+				13B07F8C1A680F5B00A75B9A /* Frameworks */,
+				13B07F8E1A680F5B00A75B9A /* Resources */,
+				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
+				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
+				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ParkNow;
+			productName = ParkNow;
+			productReference = 13B07F961A680F5B00A75B9A /* ParkNow.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		83CBB9F71A601CBA00E9B192 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1210;
+				TargetAttributes = {
+					13B07F861A680F5B00A75B9A = {
+						LastSwiftMigration = 1120;
+					};
+				};
+			};
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ParkNow" */;
+			compatibilityVersion = "Xcode 12.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 83CBB9F61A601CBA00E9B192;
+			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				13B07F861A680F5B00A75B9A /* ParkNow */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		13B07F8E1A680F5B00A75B9A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
+				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				8FECDF5EF56C4373A99D7867 /* bike.svg in Resources */,
+				B44A0DDAC08F42E48D9C5FCC /* bike_slot.svg in Resources */,
+				81C18990E628498682A8469C /* calendar.svg in Resources */,
+				11B5ECD9E0654667A97491FD /* calendar_selected.svg in Resources */,
+				59B853CDB0464981958E6504 /* car.svg in Resources */,
+				E3EC46FB90164AFDBE1149CC /* car_cancel.svg in Resources */,
+				4038BD18321B4757AE164EEB /* car_slot.svg in Resources */,
+				B53B7E41700C4C3494958B3D /* car_sucess.svg in Resources */,
+				2E75501C933E4B70AC1B5B54 /* check.svg in Resources */,
+				17638BFD74854F76933DF0B9 /* home.svg in Resources */,
+				0B6D2E2795CE41FBAB4AA049 /* home_selected.svg in Resources */,
+				17601F7F51D348B784140ECC /* hourglass.svg in Resources */,
+				AA71069502A6463AB6371ADA /* hourglassdetail.svg in Resources */,
+				013A85B83FC14B56B5C97F9B /* location.svg in Resources */,
+				734C23946C5E4B798F3AB829 /* map-pin-selected.svg in Resources */,
+				97CEE4EB28E4430B80A5A817 /* map-pin.svg in Resources */,
+				E0A6E71671CC44AA86709C65 /* notification.svg in Resources */,
+				610E0FB57DAD4111B49BF82B /* pmarker.png in Resources */,
+				D49F041F380B427A850B9AAD /* user.svg in Resources */,
+				6C6E68F05EBD45A4858EDF64 /* user_selected.svg in Resources */,
+				72079031C01A4325BD435862 /* wallet_nap_icon.svg in Resources */,
+				B59C8C32B9294C78924B4C01 /* wallet_rut_icon.svg in Resources */,
+				89D27F6042B44B1FA32F26C1 /* cardback.png in Resources */,
+				BAB09300843C4BC984C95BC8 /* car_selected_bg.png in Resources */,
+				DBC4B9E06C484BF28F1175FE /* cmnd_back.png in Resources */,
+				0562E62C44FC40DEA398DC7E /* cmnd_front.png in Resources */,
+				D9C49DED40844E9E9BBB1551 /* home_banner.png in Resources */,
+				145065E16CAC4B6D98F2B926 /* splash1.svg in Resources */,
+				2C4889E890B24606BB04E6CC /* splash2.svg in Resources */,
+				C49100BB5B6845BBB408D96A /* splash3.svg in Resources */,
+				E7F8E374D6D348B9AE9D6A53 /* 629-empty-box.json in Resources */,
+				AEAC5DDD80CA4887B58AA1D5 /* data.json in Resources */,
+				A8D6923F821F47F7AD126EE4 /* 96949-loading-animation.json in Resources */,
+				53B3A8FDD5A3438291FDB930 /* parkz.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/.xcode.env.local",
+				"$(SRCROOT)/.xcode.env",
+			);
+			name = "Bundle React Native code and images";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
+		};
+		00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ParkNow/Pods-ParkNow-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ParkNow/Pods-ParkNow-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ParkNow/Pods-ParkNow-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ParkNow-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E235C05ADACE081382539298 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ParkNow/Pods-ParkNow-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ParkNow/Pods-ParkNow-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ParkNow/Pods-ParkNow-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		13B07F871A680F5B00A75B9A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		13B07F941A680F5B00A75B9A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-ParkNow.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = ParkNow/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = ParkNow;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		13B07F951A680F5B00A75B9A /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-ParkNow.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = ParkNow/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = ParkNow;
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+		83CBBA201A601CBA00E9B192 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					/usr/lib/swift,
+					"$(inherited)",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"\"$(SDKROOT)/usr/lib/swift\"",
+					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
+					"\"$(inherited)\"",
+				);
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DFOLLY_NO_CONFIG",
+					"-DFOLLY_MOBILE=1",
+					"-DFOLLY_USE_LIBCPP=1",
+					"-DFOLLY_CFG_NO_COROUTINES=1",
+					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
+				);
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		83CBBA211A601CBA00E9B192 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					/usr/lib/swift,
+					"$(inherited)",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"\"$(SDKROOT)/usr/lib/swift\"",
+					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
+					"\"$(inherited)\"",
+				);
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DFOLLY_NO_CONFIG",
+					"-DFOLLY_MOBILE=1",
+					"-DFOLLY_USE_LIBCPP=1",
+					"-DFOLLY_CFG_NO_COROUTINES=1",
+					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
+				);
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ParkNow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				13B07F941A680F5B00A75B9A /* Debug */,
+				13B07F951A680F5B00A75B9A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ParkNow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				83CBBA201A601CBA00E9B192 /* Debug */,
+				83CBBA211A601CBA00E9B192 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 83CBB9F71A601CBA00E9B192 /* Project object */;
+}
