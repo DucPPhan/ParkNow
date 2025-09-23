@@ -4,6 +4,14 @@ import type { RouteProp } from '@react-navigation/native';
 // Sửa đường dẫn import ở đây
 import { ActivityItem } from '../screens/ActivityScreen';
 
+export type Vehicle = {
+    id: string;
+    name: string;
+    plate: string;
+    type: 'car' | 'motorcycle';
+    isDefault: boolean;
+};
+
 // Định nghĩa tất cả các route và tham số của chúng ở đây
 export type RootStackParamList = {
   Login: undefined;
@@ -11,6 +19,11 @@ export type RootStackParamList = {
   ParkingList: { title: string };
   ParkingDetail: { parkingId: string; name: string };
   ActivityDetail: { activity: ActivityItem };
+  PersonalInformation: undefined;
+  Vehicles: undefined;
+  Wallet: undefined;
+  AddVehicle: undefined;
+  VehicleDetail: { vehicle: Vehicle };
 };
 
 // Kiểu cho navigation prop ở các màn hình khác nhau

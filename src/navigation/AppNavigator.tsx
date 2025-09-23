@@ -9,6 +9,11 @@ import MainTabNavigator from './MainTabNavigator';
 import ParkingListScreen from '../screens/ParkingListScreen';
 import ParkingDetailScreen from '../screens/ParkingDetailScreen';
 import ActivityDetailScreen from '../screens/ActivityDetailScreen';
+import PersonalInformationScreen from '../screens/PersonalInformationScreen';
+import VehiclesScreen from '../screens/VehiclesScreen';
+import WalletScreen from '../screens/WalletScreen';
+import AddVehicleScreen from '../screens/AddVehicleScreen';
+import VehicleDetailScreen from '../screens/VehicleDetailScreen';
 
 const Stack = createStackNavigator<RootStackParamList>(); // Sử dụng kiểu ở đây
 
@@ -20,11 +25,16 @@ const AppNavigator = () => {
         <Stack.Screen name="MainApp" component={MainTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="ParkingList" component={ParkingListScreen} options={({ route }) => ({ title: route.params.title })} />
         <Stack.Screen name="ParkingDetail" component={ParkingDetailScreen} options={({ route }) => ({ title: route.params.name })} />
-          <Stack.Screen
+        <Stack.Screen
           name="ActivityDetail"
           component={ActivityDetailScreen}
           options={{ title: 'Chi tiết hoạt động' }}
         />
+        <Stack.Screen name="PersonalInformation" component={PersonalInformationScreen} options={{ title: 'Thông tin cá nhân' }} />
+        <Stack.Screen name="Vehicles" component={VehiclesScreen} options={{ title: 'Phương tiện' }} />
+        <Stack.Screen name="Wallet" component={WalletScreen} options={{ title: 'Ví ParkNow' }} />
+        <Stack.Screen name="AddVehicle" component={AddVehicleScreen} options={{ title: 'Thêm phương tiện' }} />
+        <Stack.Screen name="VehicleDetail" component={VehicleDetailScreen} options={{ title: 'Chi tiết phương tiện' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
