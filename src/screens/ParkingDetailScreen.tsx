@@ -13,6 +13,8 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import MapView, { Marker } from 'react-native-maps'; // Import MapView
 import Button from '../components/Button';
+import { useNavigation } from '@react-navigation/native';
+import { HomeScreenNavigationProp } from '../navigation/types';
 
 // Giả sử chúng ta nhận được dữ liệu bãi đỗ qua navigation params
 // Sẽ cập nhật navigation sau
@@ -34,6 +36,7 @@ const PARKING_DETAIL_DATA = {
 
 const ParkingDetailScreen = () => {
   const item = PARKING_DETAIL_DATA;
+  const navigation = useNavigation<HomeScreenNavigationProp>();
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -96,7 +99,10 @@ const ParkingDetailScreen = () => {
       <View style={styles.bottomBar}>
         <Button 
             title="Đặt chỗ ngay"
-            onPress={() => Alert.alert('Đặt chỗ', 'Chuyển đến màn hình đặt chỗ!')}
+            onPress={() => navigation.navigate('Booking', {
+                parkingId: item.id,
+                parkingName: item.name
+            })}
             backgroundColor="#3498db"
             textColor="#ffffff"
             // minWidth={100}

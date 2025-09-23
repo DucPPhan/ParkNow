@@ -1,4 +1,5 @@
 // src/data/mockData.ts
+import { Vehicle } from '../navigation/types';
 import { ActivityItem } from '../screens/ActivityScreen';
 
 // Thêm tọa độ vào đây
@@ -14,4 +15,9 @@ export const UPCOMING_DATA: ActivityItem[] = [
 ];
 export const HISTORY_DATA: ActivityItem[] = [
     { id: '2', name: 'Bãi xe Nowzone', date: '15/09/2025', time: '09:00 - 11:30', status: 'Hoàn thành', imageUrl: require('../assets/image/home_banner.png'), licensePlate: '72D-543.21', vehicleType: 'Xe máy'},
+];
+
+export const VEHICLES_DATA: Vehicle[] = [
+  { id: '1', name: 'Honda Wave RSX', plate: '72D1-54321', type: 'motorcycle', isDefault: true },
+  { id: '2', name: 'Mazda CX-5', plate: '51A-12345', type: 'car', isDefault: false },
 ];

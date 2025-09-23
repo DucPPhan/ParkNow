@@ -70,13 +70,15 @@ const MapScreen = () => {
 
   return (
     <View style={styles.container}>
-      // TODO: Fix lỗi không hiển thị bản đồ
-      {!currentRegion ? (
+      
+      {currentRegion ? ( // TODO: Fix lỗi không hiển thị bản đồ
         <MapView
           ref={mapRef}
           provider={PROVIDER_GOOGLE}
           style={styles.map}
-          initialRegion={currentRegion ? currentRegion : { latitude: 10.7769, longitude: 106.7009, latitudeDelta: 0.0922, longitudeDelta: 0.0421 }}
+          initialRegion={currentRegion 
+            // ? currentRegion : { latitude: 10.7769, longitude: 106.7009, latitudeDelta: 0.0922, longitudeDelta: 0.0421 }
+          }
           showsUserLocation={true}
         >
           {PARKING_DATA.map(parking => (
