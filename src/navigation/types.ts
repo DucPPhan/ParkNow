@@ -21,6 +21,7 @@ export type MainTabParamList = {
 
 // Định nghĩa tất cả các route và tham số của chúng ở đây
 export type RootStackParamList = {
+  Onboarding: undefined;
   Login: undefined;
   MainApp: NavigatorScreenParams<MainTabParamList>;
   ParkingList: { title: string };

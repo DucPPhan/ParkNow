@@ -1,44 +1,42 @@
 // src/components/Button.tsx
 
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, type ViewStyle, type TextStyle } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle, StyleProp } from 'react-native';
 
 // Định nghĩa các thuộc tính (props) mà component Button sẽ nhận
 interface ButtonProps {
   title: string;
   onPress: () => void;
-  backgroundColor: string;
-  textColor: string;
-  minWidth?: number;
-  minHeight?: number;
-  borderRadius?: number;
+  type?: 'primary' | 'secondary'; // 'primary' là mặc định
+  style?: StyleProp<ViewStyle>; // Cho phép truyền style từ bên ngoài
 }
 
 const Button = ({
   title,
   onPress,
-  backgroundColor,
-  textColor,
-  minWidth = 150,   // Giá trị mặc định
-  minHeight = 42,   // Giá trị mặc định
-  borderRadius = 50,// Giá trị mặc định
+  type = 'primary', // Mặc định là 'primary' nếu không được cung cấp
+  style,
 }: ButtonProps) => {
 
-  // Tạo style động dựa trên props
-  const buttonStyle: ViewStyle = {
-    backgroundColor: backgroundColor,
-    minWidth: minWidth,
-    minHeight: minHeight,
-    borderRadius: borderRadius,
-  };
+  // Xác định style dựa trên 'type'
+  const isPrimary = type === 'primary';
 
-  const textStyle: TextStyle = {
-    color: textColor,
-  };
+  // Style cho container của nút
+  const buttonStyle = [
+    styles.button,
+    isPrimary ? styles.primaryButton : styles.secondaryButton,
+    style, // Áp dụng style tùy chỉnh được truyền vào
+  ];
+
+  // Style cho chữ bên trong nút
+  const textStyle = [
+    styles.text,
+    isPrimary ? styles.primaryText : styles.secondaryText,
+  ];
 
   return (
-    <TouchableOpacity style={[styles.button, buttonStyle]} onPress={onPress}>
-      <Text style={[styles.text, textStyle]}>{title}</Text>
+    <TouchableOpacity style={buttonStyle} onPress={onPress}>
+      <Text style={textStyle}>{title}</Text>
     </TouchableOpacity>
   );
 };
@@ -49,11 +47,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 16,
-    elevation: 0, // Tương đương với elevation: 0.0 trong Flutter
+    minHeight: 50,
+    borderRadius: 50,
+    borderWidth: 1,
+  },
+  primaryButton: {
+    backgroundColor: '#493d8a',
+    borderColor: '#493d8a',
+  },
+  secondaryButton: {
+    backgroundColor: 'transparent',
+    borderColor: '#493d8a',
   },
   text: {
-    fontSize: 13,
-    fontWeight: '600', // '600' tương đương với SemiBold
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  primaryText: {
+    color: '#FFFFFF',
+  },
+  secondaryText: {
+    color: '#493d8a',
   },
 });
 

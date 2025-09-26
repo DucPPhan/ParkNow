@@ -15,13 +15,15 @@ import WalletScreen from '../screens/WalletScreen';
 import AddVehicleScreen from '../screens/AddVehicleScreen';
 import VehicleDetailScreen from '../screens/VehicleDetailScreen';
 import BookingScreen from '../screens/BookingScreen';
+import OnboardingScreen from '../screens/OnboardingScreen.tsx';
 
 const Stack = createStackNavigator<RootStackParamList>(); // Sử dụng kiểu ở đây
 
 const AppNavigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator initialRouteName="Onboarding" screenOptions={{headerShown: false}}>
+        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="MainApp" component={MainTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="ParkingList" component={ParkingListScreen} options={({ route }) => ({ title: route.params.title })} />
