@@ -1,4 +1,9 @@
 {
   "name": "ParkNow",
-  "displayName": "ParkNow"
+  "displayName": "ParkNow",
+  "extra": {
+    "eas": {
+      "projectId": "fbfca406-15f6-443b-8053-4d7e869cb661"
+    }
+  }
 }
