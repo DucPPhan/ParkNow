@@ -1,8 +1,8 @@
 // src/screens/MapScreen.tsx
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, PermissionsAndroid, Platform, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE, Region } from 'react-native-maps';
-import Geolocation from '@react-native-community/geolocation';
+import * as Location from 'expo-location';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import { HomeScreenNavigationProp } from '../navigation/types';
@@ -15,70 +15,53 @@ const MapScreen = () => {
 
   useEffect(() => {
     const requestLocationPermission = async () => {
-      if (Platform.OS === 'android') {
-        try {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-            {
-              title: "Quyền truy cập vị trí",
-              message: "ParkNow cần truy cập vị trí của bạn để hiển thị các bãi đỗ xe gần đây.",
-              buttonNeutral: "Hỏi lại sau",
-              buttonNegative: "Hủy",
-              buttonPositive: "OK"
-            }
-          );
-          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            getCurrentLocation();
-          } else {
-            console.log("Location permission denied");
-          }
-        } catch (err) {
-          console.warn(err);
-        }
-      } else {
-        getCurrentLocation();
+      // Yêu cầu quyền vị trí qua expo-location
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.log("Permission to access location was denied");
+        return;
       }
+      getCurrentLocation();
     };
     requestLocationPermission();
   }, []);
 
-  const getCurrentLocation = () => {
-    Geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        const region = {
-          latitude,
-          longitude,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        };
-        setCurrentRegion(region);
-        mapRef.current?.animateToRegion(region, 1000);
-      },
-      (error) => console.log(error.message),
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-    );
+  const getCurrentLocation = async () => {
+    try {
+      let { coords } = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      const region: Region = {
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      };
+
+      setCurrentRegion(region);
+      mapRef.current?.animateToRegion(region, 1000);
+    } catch (error: any) {
+      console.log("Error getting location:", error.message);
+    }
   };
 
   const onRecenter = () => {
-      if (currentRegion) {
-          mapRef.current?.animateToRegion(currentRegion, 1000);
-      } else {
-          getCurrentLocation();
-      }
-  }
+    if (currentRegion) {
+      mapRef.current?.animateToRegion(currentRegion, 1000);
+    } else {
+      getCurrentLocation();
+    }
+  };
 
   return (
     <View style={styles.container}>
-      
-      {currentRegion ? ( // TODO: Fix lỗi không hiển thị bản đồ
+      {currentRegion ? (
         <MapView
           ref={mapRef}
           provider={PROVIDER_GOOGLE}
           style={styles.map}
-          initialRegion={currentRegion 
-            // ? currentRegion : { latitude: 10.7769, longitude: 106.7009, latitudeDelta: 0.0922, longitudeDelta: 0.0421 }
-          }
+          initialRegion={currentRegion}
           showsUserLocation={true}
         >
           {PARKING_DATA.map(parking => (
@@ -87,10 +70,20 @@ const MapScreen = () => {
               coordinate={parking.coordinate}
               title={parking.name}
             >
-              <Callout tooltip onPress={() => navigation.navigate('ParkingDetail', { parkingId: parking.id, name: parking.name })}>
+              <Callout
+                tooltip
+                onPress={() =>
+                  navigation.navigate('ParkingDetail', {
+                    parkingId: parking.id,
+                    name: parking.name,
+                  })
+                }
+              >
                 <View style={styles.calloutContainer}>
                   <Text style={styles.calloutTitle}>{parking.name}</Text>
-                  <Text style={styles.calloutAddress} numberOfLines={1}>{parking.address}</Text>
+                  <Text style={styles.calloutAddress} numberOfLines={1}>
+                    {parking.address}
+                  </Text>
                   <Text style={styles.calloutAction}>Nhấn để xem chi tiết</Text>
                 </View>
               </Callout>
@@ -148,14 +141,14 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   recenterButton: {
-      position: 'absolute',
-      bottom: 30,
-      right: 20,
-      backgroundColor: '#3498db',
-      padding: 15,
-      borderRadius: 30,
-      elevation: 5,
-  }
+    position: 'absolute',
+    bottom: 30,
+    right: 20,
+    backgroundColor: '#3498db',
+    padding: 15,
+    borderRadius: 30,
+    elevation: 5,
+  },
 });
 
 export default MapScreen;
