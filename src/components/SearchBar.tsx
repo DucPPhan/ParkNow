@@ -1,4 +1,5 @@
 // src/components/SearchBar.tsx
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather'; // Import icon library
@@ -11,7 +12,7 @@ const SearchBar = ({ onPress }: SearchBarProps) => {
   return (
     <TouchableOpacity onPress={onPress} style={styles.container}>
       <View style={styles.inputBox}>
-        <Icon name="search" size={22} color="#888" style={styles.icon} />
+        <Ionicons name="search" size={22} color="#888" style={styles.icon} />
         <Text style={styles.placeholder}>Tìm kiếm bãi đỗ xe...</Text>
       </View>
     </TouchableOpacity>

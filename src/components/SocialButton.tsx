@@ -1,9 +1,11 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+
+// SỬA LỖI: Import icon từ @expo/vector-icons
+import { FontAwesome } from '@expo/vector-icons';
 
 interface SocialButtonProps {
-  iconName: string;
+  iconName: React.ComponentProps<typeof FontAwesome>['name'];
   text: string;
   onPress: () => void;
 }
@@ -11,7 +13,8 @@ interface SocialButtonProps {
 const SocialButton = ({ iconName, text, onPress }: SocialButtonProps) => {
   return (
     <TouchableOpacity style={styles.button} onPress={onPress}>
-      <Icon name={iconName} size={20} color="#000" style={styles.icon} />
+      {/* SỬA LỖI: Sử dụng component <FontAwesome /> */}
+      <FontAwesome name={iconName} size={20} color="#000" style={styles.icon} />
       <Text style={styles.text}>{text}</Text>
       <View style={{width: 20}} />{/* Spacer */}
     </TouchableOpacity>

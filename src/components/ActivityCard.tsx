@@ -1,4 +1,5 @@
 // src/components/ActivityCard.tsx
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
@@ -40,11 +41,11 @@ const ActivityCard = ({ item, onPress }: ActivityCardProps) => {
       <View style={styles.infoContainer}>
         <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
         <View style={styles.dateTimeContainer}>
-          <Icon name="calendar" size={14} color="#888" />
+          <Ionicons name="calendar" size={14} color="#888" />
           <Text style={styles.dateTimeText}>{item.date}</Text>
         </View>
         <View style={styles.dateTimeContainer}>
-          <Icon name="clock" size={14} color="#888" />
+          <Ionicons name="alarm" size={14} color="#888" />
           <Text style={styles.dateTimeText}>{item.time}</Text>
         </View>
       </View>

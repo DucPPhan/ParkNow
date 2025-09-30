@@ -1,7 +1,10 @@
 // src/components/ParkingListItem.tsx
+import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import { RootStackParamList } from '../navigation/types';
+import { Ionicons } from '@expo/vector-icons';
 
 interface ParkingListItemProps {
   item: {
@@ -9,15 +12,19 @@ interface ParkingListItemProps {
     name: string;
     address: string;
     rating: number;
-    distance: string; // Thêm thông tin khoảng cách
+    distance?: string; // Thêm thông tin khoảng cách
     imageUrl: any;
   };
+  navigation: StackNavigationProp<RootStackParamList>;
   onPress: () => void;
 }
 
-const ParkingListItem = ({ item, onPress }: ParkingListItemProps) => {
+const ParkingListItem = ({ item, onPress, navigation }: ParkingListItemProps) => {
   return (
-    <TouchableOpacity onPress={onPress} style={styles.container}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={styles.container}
+    >
       <Image source={item.imageUrl} style={styles.image} />
       <View style={styles.infoContainer}>
         <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
@@ -25,8 +32,8 @@ const ParkingListItem = ({ item, onPress }: ParkingListItemProps) => {
         <View style={styles.extraInfo}>
           <Text style={styles.rating}>⭐ {item.rating.toFixed(1)}</Text>
           <View style={styles.distanceContainer}>
-            <Icon name="map-pin" size={14} color="#888" />
-            <Text style={styles.distanceText}>{item.distance}</Text>
+            <Ionicons name="location" size={14} color="#888" />
+            {/* <Text style={styles.distanceText}>{item.distance}</Text> */}
           </View>
         </View>
       </View>

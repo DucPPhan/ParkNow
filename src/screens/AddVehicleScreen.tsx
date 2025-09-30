@@ -56,14 +56,14 @@ const AddVehicleScreen = () => {
 
         <FormInput
           label="Tên xe"
-          icon="tag"
+          icon="car"
           value={name}
           onChangeText={setName}
           placeholder="Ví dụ: Honda Wave RSX"
         />
         <FormInput
           label="Biển số xe"
-          icon="edit"
+          icon="id-card"
           value={plate}
           onChangeText={setPlate}
           placeholder="Ví dụ: 72D1-12345"
@@ -74,8 +74,8 @@ const AddVehicleScreen = () => {
           <Button
             title="Thêm phương tiện"
             onPress={handleAddVehicle}
-            backgroundColor="#3498db"
-            textColor="#ffffff"
+            // backgroundColor="#3498db"
+            // textColor="#ffffff"
             // minWidth={'100%'}
           />
         </View>

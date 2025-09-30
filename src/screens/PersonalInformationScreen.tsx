@@ -41,14 +41,14 @@ const PersonalInformationScreen = () => {
         <View style={styles.formContainer}>
           <FormInput
             label="Họ và tên"
-            icon="user"
+            icon="person"
             value={fullName}
             onChangeText={setFullName}
             placeholder="Nhập họ và tên của bạn"
           />
           <FormInput
             label="Số điện thoại"
-            icon="phone"
+            icon="phone-landscape"
             value={phone}
             onChangeText={setPhone}
             placeholder="Nhập số điện thoại"
@@ -65,7 +65,7 @@ const PersonalInformationScreen = () => {
           />
           <FormInput
             label="Giới tính"
-            icon="users"
+            icon="people-outline"
             value={gender}
             onChangeText={setGender}
             placeholder="Chọn giới tính"
@@ -84,10 +84,10 @@ const PersonalInformationScreen = () => {
           <Button
             title="Lưu thay đổi"
             onPress={handleSaveChanges}
-            backgroundColor="#3498db"
-            textColor="#ffffff"
+            // backgroundColor="#3498db"
+            // textColor="#ffffff"
             // minWidth={'100%'}
-            borderRadius={12}
+            // borderRadius={12}
           />
         </View>
       </ScrollView>

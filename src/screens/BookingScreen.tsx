@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Button from '../components/Button';
 import { VEHICLES_DATA } from '../data/mockData'; // Import dữ liệu xe
+import { Ionicons } from '@expo/vector-icons';
 
 type BookingScreenRouteProp = RouteProp<RootStackParamList, 'Booking'>;
 
@@ -66,15 +67,15 @@ const BookingScreen = () => {
         {/* Time Selection */}
         <Text style={styles.sectionTitle}>Chọn thời gian</Text>
         <TouchableOpacity style={styles.timeRow} onPress={() => setShowPicker('date')}>
-            <Icon name="calendar" size={20} color="#555" />
+            <Ionicons name="calendar" size={20} color="#555" />
             <Text style={styles.timeText}>Ngày gửi: {date.toLocaleDateString('vi-VN')}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.timeRow} onPress={() => setShowPicker('start')}>
-            <Icon name="clock" size={20} color="#555" />
+            <Ionicons name="alarm" size={20} color="#555" />
             <Text style={styles.timeText}>Giờ vào: {startTime.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.timeRow} onPress={() => setShowPicker('end')}>
-            <Icon name="clock" size={20} color="#555" />
+            <Ionicons name="alarm" size={20} color="#555" />
             <Text style={styles.timeText}>Giờ ra: {endTime.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}</Text>
         </TouchableOpacity>
 
@@ -99,8 +100,8 @@ const BookingScreen = () => {
         <Button 
             title="Xác nhận đặt chỗ"
             onPress={handleConfirmBooking}
-            backgroundColor="#2ecc71"
-            textColor="#ffffff"
+            // backgroundColor="#2ecc71"
+            // textColor="#ffffff"
             // minWidth={'100%'}
         />
       </View>

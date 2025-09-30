@@ -1,10 +1,12 @@
-// src/components/ProfileMenuItem.tsx
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
+
+// Lấy ra kiểu dữ liệu chính xác cho tên của các icon trong bộ Ionicons
+type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
 interface ProfileMenuItemProps {
-  icon: string;
+  icon: IoniconName; // SỬA LỖI: Sử dụng kiểu dữ liệu chính xác thay vì 'string'
   title: string;
   onPress: () => void;
   isLogout?: boolean;
@@ -14,10 +16,12 @@ const ProfileMenuItem = ({ icon, title, onPress, isLogout = false }: ProfileMenu
   return (
     <TouchableOpacity onPress={onPress} style={styles.container}>
       <View style={[styles.iconContainer, isLogout && styles.logoutIconBg]}>
-        <Icon name={icon} size={20} color={isLogout ? '#e74c3c' : '#3498db'} />
+        <Ionicons name={icon} size={20} color={isLogout ? '#e74c3c' : '#3498db'} />
       </View>
       <Text style={[styles.title, isLogout && styles.logoutText]}>{title}</Text>
-      {!isLogout && <Icon name="chevron-right" size={22} color="#ccc" />}
+      
+      {/* Sửa lại để thống nhất dùng Ionicons */}
+      {!isLogout && <Ionicons name="chevron-forward-outline" size={22} color="#ccc" />}
     </TouchableOpacity>
   );
 };

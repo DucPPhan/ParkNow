@@ -41,17 +41,17 @@ const AccountScreen = () => {
         {/* Menu */}
         <View style={styles.menuContainer}>
           <ProfileMenuItem 
-            icon="user" 
+            icon="person" 
             title="Thông tin cá nhân" 
             onPress={() => navigation.navigate('PersonalInformation')} 
           />
           <ProfileMenuItem 
-            icon="truck" 
+            icon="car" 
             title="Phương tiện" 
             onPress={() => navigation.navigate('Vehicles')} 
           />
           <ProfileMenuItem 
-            icon="credit-card" 
+            icon="wallet" 
             title="Ví điện tử" 
             onPress={() => navigation.navigate('Wallet')} 
           />

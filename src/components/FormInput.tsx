@@ -1,11 +1,14 @@
 // src/components/FormInput.tsx
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, TextInputProps } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 
+type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+
 interface FormInputProps extends TextInputProps {
   label: string;
-  icon: string;
+  icon: IoniconName;
 }
 
 const FormInput = ({ label, icon, ...props }: FormInputProps) => {
@@ -13,7 +16,7 @@ const FormInput = ({ label, icon, ...props }: FormInputProps) => {
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.inputContainer}>
-        <Icon name={icon} size={20} color="#888" style={styles.icon} />
+        <Ionicons name={icon} size={20} color="#888" style={styles.icon} />
         <TextInput
           style={styles.input}
           placeholderTextColor="#a9a9a9"

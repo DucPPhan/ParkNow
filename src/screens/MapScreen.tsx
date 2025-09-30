@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import { HomeScreenNavigationProp } from '../navigation/types';
 import { PARKING_DATA } from '../data/mockData';
+import { Ionicons } from '@expo/vector-icons';
 
 const MapScreen = () => {
   const [currentRegion, setCurrentRegion] = useState<Region | null>(null);
@@ -98,7 +99,7 @@ const MapScreen = () => {
 
       {/* Nút quay về vị trí hiện tại */}
       <TouchableOpacity style={styles.recenterButton} onPress={onRecenter}>
-        <Icon name="navigation" size={24} color="#fff" />
+        <Ionicons name="navigate" size={24} color="#fff" />
       </TouchableOpacity>
     </View>
   );
