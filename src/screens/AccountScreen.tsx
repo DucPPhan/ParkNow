@@ -1,65 +1,123 @@
-// src/screens/AccountScreen.tsx
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, Image, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { HomeScreenNavigationProp } from '../navigation/types';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/types';
+import { Ionicons } from '@expo/vector-icons';
 import ProfileMenuItem from '../components/ProfileMenuItem';
+import api from '../services/api';
 
-const AccountScreen = () => {
-  const navigation = useNavigation<HomeScreenNavigationProp>();
+type AccountScreenNavigationProp = StackNavigationProp<RootStackParamList, 'MainApp'>;
+
+type Props = {
+  navigation: AccountScreenNavigationProp;
+};
+
+const AccountScreen = ({ navigation }: Props) => {
 
   const handleLogout = () => {
     Alert.alert(
-      "Đăng xuất",
+      "Xác nhận đăng xuất",
       "Bạn có chắc chắn muốn đăng xuất?",
       [
         { text: "Hủy", style: "cancel" },
-        { text: "Đăng xuất", style: "destructive", onPress: () => {
-            // Quay về màn hình Login và xóa hết lịch sử navigation
+        {
+          text: "Đồng ý",
+          onPress: async () => {
+            await api.logout();
             navigation.reset({
-                index: 0,
-                routes: [{ name: 'Login' }],
+              index: 0,
+              routes: [{ name: 'Login' }],
             });
-        } },
+          },
+          style: 'destructive'
+        }
       ]
     );
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* Profile Header */}
-        <View style={styles.profileHeader}>
-          <Image 
-            source={require('../assets/image/home_banner.png')} 
-            style={styles.avatar} 
-          />
-          <Text style={styles.name}>Lê Văn A</Text>
-          <Text style={styles.email}>levana@email.com</Text>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.headerTitle}>Tài khoản</Text>
         </View>
 
-        {/* Menu */}
+        {/* === Header Hồ sơ === */}
+        <TouchableOpacity
+          style={styles.profileSection}
+          onPress={() => navigation.navigate('PersonalInformation')}
+        >
+          <Image
+            source={{ uri: `https://i.pravatar.cc/150?u=a042581f4e29026704d` }}
+            style={styles.avatar}
+          />
+          <View style={styles.profileInfo}>
+            <Text style={styles.userName}>ParkNow User</Text>
+            <Text style={styles.userPhone}>+84 123 456 789</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={24} color="#ccc" />
+        </TouchableOpacity>
+
+        {/* SỬA LỖI: Gom các nhóm menu vào các card có nền trắng */}
+
+        {/* === Nhóm Menu 1: Quản lý tài khoản === */}
         <View style={styles.menuContainer}>
-          <ProfileMenuItem 
-            icon="person" 
-            title="Thông tin cá nhân" 
-            onPress={() => navigation.navigate('PersonalInformation')} 
+          <ProfileMenuItem
+            icon="wallet-outline"
+            title="Ví của tôi"
+            onPress={() => navigation.navigate('Wallet')}
           />
-          <ProfileMenuItem 
-            icon="car" 
-            title="Phương tiện" 
-            onPress={() => navigation.navigate('Vehicles')} 
+          <View style={styles.divider} />
+          <ProfileMenuItem
+            icon="car-sport-outline"
+            title="Phương tiện"
+            onPress={() => navigation.navigate('Vehicles')}
           />
-          <ProfileMenuItem 
-            icon="wallet" 
-            title="Ví điện tử" 
-            onPress={() => navigation.navigate('Wallet')} 
+          <View style={styles.divider} />
+          <ProfileMenuItem
+            icon="heart-outline"
+            title="Địa chỉ yêu thích"
+            onPress={() => { /* Thêm navigation khi có màn hình */ }}
           />
-          <ProfileMenuItem 
-            icon="log-out" 
-            title="Đăng xuất" 
+        </View>
+
+        {/* === Nhóm Menu 2: Hỗ trợ & Ứng dụng === */}
+        <View style={styles.menuContainer}>
+          <ProfileMenuItem
+            icon="help-circle-outline"
+            title="Trợ giúp & Hỗ trợ"
+            onPress={() => { }}
+          />
+          <View style={styles.divider} />
+          <ProfileMenuItem
+            icon="settings-outline"
+            title="Cài đặt"
+            onPress={() => { }}
+          />
+          <View style={styles.divider} />
+          <ProfileMenuItem
+            icon="information-circle-outline"
+            title="Về chúng tôi"
+            onPress={() => { }}
+          />
+        </View>
+
+        {/* === Nút Đăng xuất === */}
+        <View style={styles.menuContainer}>
+          <ProfileMenuItem
+            icon="log-out-outline"
+            title="Đăng xuất"
             onPress={handleLogout}
-            isLogout={true}
+            isLogout
           />
         </View>
       </ScrollView>
@@ -68,37 +126,70 @@ const AccountScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#f8f8f8',
-  },
   container: {
+    flex: 1,
+    backgroundColor: '#f4f6f9',
+  },
+  headerContainer: {
     padding: 20,
+    backgroundColor: '#fff',
   },
-  profileHeader: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: '#3498db',
-    marginBottom: 15,
-  },
-  name: {
-    fontSize: 22,
+  headerTitle: {
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#333',
   },
-  email: {
-    fontSize: 16,
-    color: '#777',
+  profileSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    marginTop: 16,
+    marginHorizontal: 16,
+    borderRadius: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  avatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 15,
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  userName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  userPhone: {
+    fontSize: 14,
+    color: 'gray',
     marginTop: 4,
   },
+  // SỬA LỖI: Style cho container của menu
   menuContainer: {
-    marginTop: 10,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    marginHorizontal: 16,
+    marginTop: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    overflow: 'hidden', // Giúp bo góc cho các item bên trong
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#f0f0f0',
+    marginLeft: 60, // Căn lề với vị trí của text
   },
 });
 

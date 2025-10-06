@@ -5,7 +5,6 @@ import { useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { ActivityDetailScreenRouteProp } from '../navigation/types';
 
-// Import các component mới
 import RatingStars from '../components/RatingStars';
 import InfoRow from '../components/InfoRow';
 import Button from '../components/Button';
@@ -22,23 +21,40 @@ const ActivityDetailScreen = () => {
   const route = useRoute<ActivityDetailScreenRouteProp>();
   const { activity } = route.params;
 
+  const isCancelled = activity.status === 'Đã hủy';
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom']}>
       <ScrollView style={styles.scrollView}>
-        {/* === PHẦN 1: TRẠNG THÁI === */}
+        {/* === PHẦN 1: TRẠNG THÁI (Thay đổi dựa trên status) === */}
         <View style={[styles.container, styles.statusContainer]}>
           <View style={styles.iconWrapper}>
             <Ionicons
               name={activity.vehicleType === 'car' ? 'car-sport' : 'bicycle'}
               size={50}
-              color="#3498db"
+              color={isCancelled ? '#95a5a6' : '#3498db'} // Màu xám nếu bị hủy
             />
             <View style={styles.checkIcon}>
-              <Ionicons name="checkmark-circle" size={24} color="#2ecc71" />
+              {isCancelled ? (
+                <Ionicons name="close-circle" size={24} color="#e74c3c" /> // Dấu X đỏ
+              ) : (
+                <Ionicons name="checkmark-circle" size={24} color="#2ecc71" /> // Tích xanh
+              )}
             </View>
           </View>
-          <Text style={styles.statusText}>{activity.status}</Text>
-          <RatingStars rating={activity.userRating} size={28} />
+          <Text style={[styles.statusText, isCancelled && styles.statusTextCancelled]}>
+            {activity.status}
+          </Text>
+
+          {/* --- Hiển thị Rating hoặc Thông báo Hủy --- */}
+          {isCancelled ? (
+            <View style={styles.cancelledInfoBox}>
+              <Text style={styles.cancelledText}>Hoạt động này đã bị hủy.</Text>
+              <Text style={styles.cancelledSubText}>Bạn không bị tính phí cho hoạt động này.</Text>
+            </View>
+          ) : (
+            <RatingStars rating={activity.userRating} size={28} />
+          )}
         </View>
 
         {/* === PHẦN 2 & 3: THÔNG TIN & THANH TOÁN === */}
@@ -61,15 +77,17 @@ const ActivityDetailScreen = () => {
                 <Text style={styles.parkingAddress} numberOfLines={2}>{activity.parkingAddress}</Text>
               </View>
             </View>
-            <View style={styles.timeInfoRow}>
-              <Ionicons name="hourglass-outline" size={70} color="gray" />
-              <View style={styles.timeTextContainer}>
-                <Text style={styles.timeLabel}>Giờ vào:</Text>
-                <Text style={styles.timeLabel}>{activity.startTime} - {activity.date}</Text>
-                <Text style={styles.timeLabel}>Giờ ra:</Text>
-                <Text style={styles.timeLabel}>{activity.endTime} - {activity.date}</Text>
+
+            {/* --- Chỉ hiển thị thời gian nếu không bị hủy --- */}
+            {!isCancelled && (
+              <View style={styles.timeInfoRow}>
+                <Ionicons name="hourglass-outline" size={70} color="gray" />
+                <View style={styles.timeTextContainer}>
+                  <Text style={styles.timeLabel}>Giờ vào: {activity.startTime}</Text>
+                  <Text style={styles.timeLabel}>Giờ ra: {activity.endTime}</Text>
+                </View>
               </View>
-            </View>
+            )}
           </Section>
 
           <View style={styles.divider} />
@@ -91,7 +109,7 @@ const ActivityDetailScreen = () => {
     </SafeAreaView>
   );
 };
-// ... Styles
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -133,6 +151,29 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#2ecc71',
     marginBottom: 8,
+  },
+  statusTextCancelled: {
+    color: '#e74c3c', // Màu đỏ cho trạng thái hủy
+  },
+  // Khung thông báo hủy
+  cancelledInfoBox: {
+    backgroundColor: '#f8d7da',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    width: '100%',
+  },
+  cancelledText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#721c24',
+    textAlign: 'center',
+  },
+  cancelledSubText: {
+    fontSize: 14,
+    color: '#721c24',
+    textAlign: 'center',
+    marginTop: 4,
   },
   // Phần 2 & 3
   sectionContainer: {
