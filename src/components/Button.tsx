@@ -1,47 +1,54 @@
-// src/components/Button.tsx
-
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle, StyleProp } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, StyleProp, ViewStyle, ActivityIndicator } from 'react-native';
 
-// Định nghĩa các thuộc tính (props) mà component Button sẽ nhận
 interface ButtonProps {
   title: string;
   onPress: () => void;
-  type?: 'primary' | 'secondary'; // 'primary' là mặc định
-  style?: StyleProp<ViewStyle>; // Cho phép truyền style từ bên ngoài
+  type?: 'primary' | 'secondary';
+  style?: StyleProp<ViewStyle>;
+  disabled?: boolean; // THÊM PROP NÀY
+  loading?: boolean; // Thêm prop loading để hiển thị ActivityIndicator
 }
 
 const Button = ({
   title,
   onPress,
-  type = 'primary', // Mặc định là 'primary' nếu không được cung cấp
+  type = 'primary',
   style,
+  disabled = false, // THÊM PROP NÀY
+  loading = false,  // Thêm prop loading
 }: ButtonProps) => {
-
-  // Xác định style dựa trên 'type'
   const isPrimary = type === 'primary';
 
-  // Style cho container của nút
+  // Thêm style cho trạng thái disabled
   const buttonStyle = [
     styles.button,
     isPrimary ? styles.primaryButton : styles.secondaryButton,
-    style, // Áp dụng style tùy chỉnh được truyền vào
+    (disabled || loading) && (isPrimary ? styles.primaryDisabled : styles.secondaryDisabled), // Áp dụng style disabled
+    style,
   ];
 
-  // Style cho chữ bên trong nút
   const textStyle = [
     styles.text,
     isPrimary ? styles.primaryText : styles.secondaryText,
+    (disabled || loading) && styles.disabledText, // Áp dụng style text disabled
   ];
 
   return (
-    <TouchableOpacity style={buttonStyle} onPress={onPress}>
-      <Text style={textStyle}>{title}</Text>
+    <TouchableOpacity
+      style={buttonStyle}
+      onPress={onPress}
+      disabled={disabled || loading} // Vô hiệu hóa TouchableOpacity
+    >
+      {loading ? (
+        <ActivityIndicator color={isPrimary ? '#FFFFFF' : '#a9a9a9'} />
+      ) : (
+        <Text style={textStyle}>{title}</Text>
+      )}
     </TouchableOpacity>
   );
 };
 
-// Định nghĩa các style cố định
 const styles = StyleSheet.create({
   button: {
     justifyContent: 'center',
@@ -52,12 +59,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   primaryButton: {
-    backgroundColor: '#493d8a',
-    borderColor: '#493d8a',
+    backgroundColor: '#00B14F', // Màu xanh lá cây
+    borderColor: '#00B14F',
   },
   secondaryButton: {
     backgroundColor: 'transparent',
-    borderColor: '#493d8a',
+    borderColor: '#00B14F',
+  },
+  // Style cho trạng thái disabled
+  primaryDisabled: {
+    backgroundColor: '#a3d3b8',
+    borderColor: '#a3d3b8',
+  },
+  secondaryDisabled: {
+    borderColor: '#a9a9a9',
   },
   text: {
     fontSize: 16,
@@ -67,7 +82,10 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   secondaryText: {
-    color: '#493d8a',
+    color: '#00B14F',
+  },
+  disabledText: {
+    color: '#FFFFFF',
   },
 });
 

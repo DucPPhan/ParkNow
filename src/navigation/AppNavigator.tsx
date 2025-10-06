@@ -16,6 +16,7 @@ import AddVehicleScreen from '../screens/AddVehicleScreen';
 import VehicleDetailScreen from '../screens/VehicleDetailScreen';
 import BookingScreen from '../screens/BookingScreen';
 import OnboardingScreen from '../screens/OnboardingScreen.tsx';
+import RegistrationNavigator from './RegistrationNavigator.tsx';
 
 const Stack = createStackNavigator<RootStackParamList>(); // Sử dụng kiểu ở đây
 
@@ -25,6 +26,7 @@ const AppNavigator = () => {
       <Stack.Navigator initialRouteName="Onboarding" screenOptions={{headerShown: false}}>
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="RegistrationFlow" component={RegistrationNavigator} />
         <Stack.Screen name="MainApp" component={MainTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="ParkingList" component={ParkingListScreen} options={({ route }) => ({ title: route.params.title })} />
         <Stack.Screen name="ParkingDetail" component={ParkingDetailScreen} options={({ route }) => ({ title: route.params.name })} />

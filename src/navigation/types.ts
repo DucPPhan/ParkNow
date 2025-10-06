@@ -33,6 +33,7 @@ export type RootStackParamList = {
   AddVehicle: undefined;
   VehicleDetail: { vehicle: Vehicle };
   Booking: { parkingId: string; parkingName: string };
+  RegistrationFlow: undefined;
 };
 
 // Kiểu cho navigation prop ở các màn hình khác nhau
@@ -45,3 +46,8 @@ export type BookingScreenNavigationProp = StackNavigationProp<RootStackParamList
 // Kiểu cho route prop để lấy params
 export type ParkingDetailScreenRouteProp = RouteProp<RootStackParamList, 'ParkingDetail'>;
 export type ActivityDetailScreenRouteProp = RouteProp<RootStackParamList, 'ActivityDetail'>;
+export type RegistrationStackParamList = {
+  Step1_Phone: undefined;
+  Step2_PersonalInfo: undefined;
+  Step3_IDCard: undefined;
+};

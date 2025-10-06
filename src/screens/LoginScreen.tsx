@@ -4,16 +4,19 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
+  // SafeAreaView,
   StatusBar,
   KeyboardAvoidingView,
   Platform,
   TextInput,
-  Alert, // Import Alert để hiển thị thông báo
+  Alert,
+  ActivityIndicator, // Import component loading
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/types';
 import SocialButton from '../components/SocialButton';
+import api from '../services/api'; // Import service mới
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -21,24 +24,36 @@ type Props = {
   navigation: LoginScreenNavigationProp;
 };
 
-const GRAB_GREEN = '#0050b1ff';
+const GRAB_GREEN = '#00B14F';
 
 const LoginScreen = ({ navigation }: Props) => {
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [loading, setLoading] = useState(false); // Thêm state cho trạng thái loading
 
-  const handleContinue = () => {
-    // Regex đơn giản để kiểm tra SĐT Việt Nam (bắt đầu bằng 0, theo sau là 9 số)
+  const handleLogin = async () => {
+    // Kiểm tra định dạng số điện thoại
     const vietnamPhoneRegex = /^0\d{9}$/;
-    const isValid = vietnamPhoneRegex.test(phoneNumber);
+    if (!vietnamPhoneRegex.test(phoneNumber)) {
+      Alert.alert("Lỗi", "Số điện thoại không hợp lệ. Vui lòng kiểm tra lại.");
+      return;
+    }
+    // else {
+    //   navigation.replace('MainApp', { screen: 'HomeTab' });
+    // }
 
-    if (isValid) {
-      console.log('Số điện thoại hợp lệ:', phoneNumber);
+    setLoading(true); // Bắt đầu loading
+
+    // Gọi hàm login từ service API
+    const result = await api.login(phoneNumber);
+
+    setLoading(false); // Dừng loading
+
+    if (result.success) {
+      // Đăng nhập thành công, chuyển đến màn hình chính
       navigation.replace('MainApp', { screen: 'HomeTab' });
     } else {
-      Alert.alert(
-        "Số điện thoại không hợp lệ",
-        "Vui lòng nhập số điện thoại hợp lệ của Việt Nam (ví dụ: 0912345678)."
-      );
+      // Đăng nhập thất bại, hiển thị thông báo lỗi từ server
+      Alert.alert("Đăng nhập thất bại", result.message || "Đã có lỗi không mong muốn xảy ra.");
     }
   };
 
@@ -54,27 +69,40 @@ const LoginScreen = ({ navigation }: Props) => {
             Đăng nhập vào ParkNow để tìm chỗ đỗ xe nhanh chóng
           </Text>
 
-          {/* === BẮT ĐẦU THAY ĐỔI COMPONENT NHẬP SỐ ĐIỆN THOẠI === */}
           <View style={styles.phoneInputContainer}>
             <View style={styles.countryCodeContainer}>
-                <Text style={styles.flagEmoji}>🇻🇳</Text>
-                <Text style={styles.countryCodeText}>+84</Text>
+              <Text style={styles.flagEmoji}>🇻🇳</Text>
+              <Text style={styles.countryCodeText}>+84</Text>
             </View>
             <TextInput
-                style={styles.textInput}
-                placeholder="Số điện thoại"
-                placeholderTextColor="#8A8A8E"
-                keyboardType="phone-pad"
-                value={phoneNumber}
-                onChangeText={setPhoneNumber}
-                autoFocus
-                maxLength={10}
+              style={styles.textInput}
+              placeholder="Số điện thoại"
+              placeholderTextColor="#8A8A8E"
+              keyboardType="phone-pad"
+              value={phoneNumber}
+              onChangeText={setPhoneNumber}
+              autoFocus
+              maxLength={10}
+              editable={!loading} // Không cho sửa khi đang loading
             />
           </View>
-          {/* === KẾT THÚC THAY ĐỔI === */}
 
-          <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
-            <Text style={styles.continueButtonText}>Tiếp tục</Text>
+          <TouchableOpacity
+            style={[styles.continueButton, loading && styles.disabledButton]}
+            onPress={handleLogin}
+            disabled={loading} // Vô hiệu hóa nút khi đang loading
+          >
+            {loading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <Text style={styles.continueButtonText}>Tiếp tục</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigation.navigate('RegistrationFlow')}>
+            <Text style={{ textAlign: 'center', color: '#007AFF', marginTop: 15 }}>
+              Chưa có tài khoản? Đăng ký ngay
+            </Text>
           </TouchableOpacity>
 
           <View style={styles.separatorContainer}>
@@ -86,16 +114,12 @@ const LoginScreen = ({ navigation }: Props) => {
           <SocialButton
             iconName="google"
             text="Đăng nhập với Google"
-            onPress={() => {
-              /* Xử lý đăng nhập Google */
-            }}
+            onPress={() => { }}
           />
           <SocialButton
             iconName="facebook"
             text="Đăng nhập với Facebook"
-            onPress={() => {
-              /* Xử lý đăng nhập Facebook */
-            }}
+            onPress={() => { }}
           />
         </View>
 
@@ -134,7 +158,6 @@ const styles = StyleSheet.create({
     color: '#6E6E73',
     marginBottom: 32,
   },
-  // Style cho component mới
   phoneInputContainer: {
     width: '100%',
     height: 56,
@@ -165,7 +188,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     color: '#1C1C1E',
   },
-  // Kết thúc style cho component mới
   continueButton: {
     backgroundColor: GRAB_GREEN,
     borderRadius: 50,
@@ -174,6 +196,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 24,
     width: '100%',
+  },
+  disabledButton: {
+    backgroundColor: '#a3d3b8',
   },
   continueButtonText: {
     color: '#FFFFFF',
