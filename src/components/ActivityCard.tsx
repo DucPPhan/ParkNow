@@ -1,113 +1,161 @@
-// src/components/ActivityCard.tsx
-import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-type StatusType = 'Sắp tới' | 'Hoàn thành' | 'Đã hủy';
+// Định nghĩa các kiểu dữ liệu cho props
+export interface Activity {
+  id: string;
+  orderId: string; // Thêm
+  userName: string; // Thêm
+  userRating: number; // Thêm
+  vehicleType: 'car' | 'motorcycle';
+  date: string;
+  time: string;
+  startTime: string; // Thêm
+  endTime: string; // Thêm
+  status: 'Hoàn thành' | 'Đã hủy' | 'Đang diễn ra';
+  vehicleInfo: string;
+  vehicleLicensePlate: string;
+  parkingName: string;
+  parkingAddress: string;
+  slot: string;
+  paymentMethod: string; // Thêm
+  prepaidHours: string; // Thêm
+  extraHours: string; // Thêm
+  total: number; // Thêm
+  parkingImageUrl?: any; // Thêm
+}
 
 interface ActivityCardProps {
-  item: {
-    id: string;
-    name: string;
-    date: string;
-    time: string;
-    status: StatusType;
-    imageUrl: any;
-  };
+  item: Activity;
   onPress: () => void;
 }
 
-// Hàm để lấy màu dựa trên trạng thái
-const getStatusStyle = (status: StatusType) => {
-  switch (status) {
-    case 'Sắp tới':
-      return { backgroundColor: '#3498db', color: '#ffffff' };
-    case 'Hoàn thành':
-      return { backgroundColor: '#2ecc71', color: '#ffffff' };
-    case 'Đã hủy':
-      return { backgroundColor: '#e74c3c', color: '#ffffff' };
-    default:
-      return { backgroundColor: '#bdc3c7', color: '#ffffff' };
-  }
+// Component cho tag trạng thái (status)
+const StatusTag = ({ status }: { status: Activity['status'] }) => {
+  const statusStyle = {
+    backgroundColor:
+      status === 'Hoàn thành'
+        ? '#d4edda' // Green
+        : status === 'Đã hủy'
+          ? '#f8d7da' // Red
+          : '#cce5ff', // Blue
+    color:
+      status === 'Hoàn thành'
+        ? '#155724'
+        : status === 'Đã hủy'
+          ? '#721c24'
+          : '#004085',
+  };
+
+  return (
+    <View style={[styles.statusContainer, { backgroundColor: statusStyle.backgroundColor }]}>
+      <Text style={[styles.statusText, { color: statusStyle.color }]}>{status}</Text>
+    </View>
+  );
 };
 
 const ActivityCard = ({ item, onPress }: ActivityCardProps) => {
-  const statusStyle = getStatusStyle(item.status);
-
   return (
-    <TouchableOpacity onPress={onPress} style={styles.container}>
-      <Image source={item.imageUrl} style={styles.image} />
-      <View style={styles.infoContainer}>
-        <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
-        <View style={styles.dateTimeContainer}>
-          <Ionicons name="calendar" size={14} color="#888" />
-          <Text style={styles.dateTimeText}>{item.date}</Text>
+    <TouchableOpacity onPress={onPress} style={styles.card}>
+      {/* === PHẦN TRÊN === */}
+      <View style={styles.topSection}>
+        {/* Icon phương tiện */}
+        <View style={styles.iconContainer}>
+          <Ionicons
+            name={item.vehicleType === 'car' ? 'car-sport' : 'bicycle'}
+            size={32}
+            color="#3498db"
+          />
         </View>
-        <View style={styles.dateTimeContainer}>
-          <Ionicons name="alarm" size={14} color="#888" />
-          <Text style={styles.dateTimeText}>{item.time}</Text>
+
+        {/* Thông tin chính */}
+        <View style={styles.mainInfo}>
+          <View style={styles.timeStatusRow}>
+            <Text style={styles.dateTime}>{`${item.date} | ${item.time}`}</Text>
+            <StatusTag status={item.status} />
+          </View>
+          <Text style={styles.vehicleInfo}>{`${item.vehicleInfo} / ${item.vehicleLicensePlate}`}</Text>
         </View>
       </View>
-      <View style={[styles.statusBadge, { backgroundColor: statusStyle.backgroundColor }]}>
-        <Text style={[styles.statusText, { color: statusStyle.color }]}>{item.status}</Text>
+
+      {/* Đường kẻ phân cách */}
+      <View style={styles.divider} />
+
+      {/* === PHẦN DƯỚI === */}
+      <View style={styles.bottomSection}>
+        <Text style={styles.parkingName} numberOfLines={1}>{`${item.parkingName} - ${item.parkingAddress}`}</Text>
+        <Text style={styles.slotInfo}>Parking: {item.slot}</Text>
       </View>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  card: {
     backgroundColor: 'white',
     borderRadius: 12,
-    padding: 12,
-    marginHorizontal: 20,
-    marginBottom: 15,
+    padding: 16,
+    marginBottom: 16,
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.15,
-    shadowRadius: 2,
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-  image: {
-    width: 70,
-    height: 70,
-    borderRadius: 8,
-  },
-  infoContainer: {
-    flex: 1,
-    marginLeft: 12,
-    justifyContent: 'center',
-  },
-  name: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  dateTimeContainer: {
+  topSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
   },
-  dateTimeText: {
-    marginLeft: 6,
+  iconContainer: {
+    backgroundColor: '#eaf5ff',
+    padding: 15,
+    borderRadius: 10,
+    marginRight: 15,
+  },
+  mainInfo: {
+    flex: 1,
+  },
+  timeStatusRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  dateTime: {
     fontSize: 14,
-    color: '#666',
+    color: '#555',
+    fontWeight: '500',
   },
-  statusBadge: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
+  statusContainer: {
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 6,
   },
   statusText: {
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  vehicleInfo: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '600',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#f0f0f0',
+    marginVertical: 12,
+  },
+  bottomSection: {},
+  parkingName: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 4,
+  },
+  slotInfo: {
+    fontSize: 14,
+    color: 'gray',
   },
 });
 

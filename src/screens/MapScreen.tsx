@@ -1,155 +1,158 @@
-// src/screens/MapScreen.tsx
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native';
-import MapView, { Marker, Callout, PROVIDER_GOOGLE, Region } from 'react-native-maps';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
-import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
-import { HomeScreenNavigationProp } from '../navigation/types';
-import { PARKING_DATA } from '../data/mockData';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/types';
+import api from '../services/api';
 import { Ionicons } from '@expo/vector-icons';
 
+// Định nghĩa kiểu cho dữ liệu bãi xe trả về từ API
+interface NearbyParking {
+  parkingId: number;
+  parkingName: string;
+  address: string;
+  latitude: number;
+  longtitude: number;
+  distance: number;
+}
+
+type NavigationProp = StackNavigationProp<RootStackParamList>;
+
 const MapScreen = () => {
-  const [currentRegion, setCurrentRegion] = useState<Region | null>(null);
-  const navigation = useNavigation<HomeScreenNavigationProp>();
-  const mapRef = useRef<MapView>(null);
+  const navigation = useNavigation<NavigationProp>();
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [parkings, setParkings] = useState<NearbyParking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    const requestLocationPermission = async () => {
-      // Yêu cầu quyền vị trí qua expo-location
+    (async () => {
+      setLoading(true);
+      setErrorMsg(null);
+
+      // 1. Hỏi quyền truy cập vị trí
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        console.log("Permission to access location was denied");
+        setErrorMsg('Quyền truy cập vị trí đã bị từ chối.');
+        Alert.alert('Lỗi', 'Vui lòng cho phép ứng dụng truy cập vị trí để sử dụng bản đồ.');
+        setLoading(false);
         return;
       }
-      getCurrentLocation();
-    };
-    requestLocationPermission();
+
+      try {
+        // 2. Lấy vị trí hiện tại
+        const currentLocation = await Location.getCurrentPositionAsync({});
+        setLocation(currentLocation);
+
+        // 3. Gọi API để lấy các bãi xe gần đó
+        const result = await api.getNearbyParkings(
+          currentLocation.coords.latitude,
+          currentLocation.coords.longitude
+        );
+
+        if (result.success && Array.isArray(result.data)) {
+          setParkings(result.data);
+        } else {
+          setErrorMsg(result.message || 'Không thể tải dữ liệu bãi xe.');
+        }
+      } catch (error) {
+        setErrorMsg('Đã xảy ra lỗi khi tải dữ liệu.');
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
-  const getCurrentLocation = async () => {
-    try {
-      let { coords } = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
-      });
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#3498db" />
+        <Text style={styles.loadingText}>Đang tìm vị trí và các bãi xe...</Text>
+      </View>
+    );
+  }
 
-      const region: Region = {
-        latitude: coords.latitude,
-        longitude: coords.longitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      };
-
-      setCurrentRegion(region);
-      mapRef.current?.animateToRegion(region, 1000);
-    } catch (error: any) {
-      console.log("Error getting location:", error.message);
-    }
-  };
-
-  const onRecenter = () => {
-    if (currentRegion) {
-      mapRef.current?.animateToRegion(currentRegion, 1000);
-    } else {
-      getCurrentLocation();
-    }
-  };
+  if (errorMsg) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.errorText}>{errorMsg}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      {currentRegion ? (
+      {location && (
         <MapView
-          ref={mapRef}
+          style={StyleSheet.absoluteFillObject}
           provider={PROVIDER_GOOGLE}
-          style={styles.map}
-          initialRegion={currentRegion}
-          showsUserLocation={true}
+          initialRegion={{
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.02, // Zoom level
+            longitudeDelta: 0.01,
+          }}
+          showsUserLocation // Hiển thị chấm xanh cho vị trí người dùng
         >
-          {PARKING_DATA.map(parking => (
+          {/* Đánh dấu các bãi xe */}
+          {parkings.map((parking) => (
             <Marker
-              key={parking.id}
-              coordinate={parking.coordinate}
-              title={parking.name}
+              key={parking.parkingId}
+              coordinate={{
+                latitude: parking.latitude,
+                longitude: parking.longtitude,
+              }}
+              title={parking.parkingName}
+              description={parking.address}
+              onCalloutPress={() =>
+                navigation.navigate('ParkingDetail', {
+                  parkingId: parking.parkingId.toString(),
+                  name: parking.parkingName,
+                })
+              }
             >
-              <Callout
-                tooltip
-                onPress={() =>
-                  navigation.navigate('ParkingDetail', {
-                    parkingId: parking.id,
-                    name: parking.name,
-                  })
-                }
-              >
-                <View style={styles.calloutContainer}>
-                  <Text style={styles.calloutTitle}>{parking.name}</Text>
-                  <Text style={styles.calloutAddress} numberOfLines={1}>
-                    {parking.address}
-                  </Text>
-                  <Text style={styles.calloutAction}>Nhấn để xem chi tiết</Text>
-                </View>
-              </Callout>
+              {/* Sử dụng icon tùy chỉnh cho bãi xe */}
+              <View style={styles.markerContainer}>
+                <Ionicons name="car-sport" size={24} color="white" />
+              </View>
             </Marker>
           ))}
         </MapView>
-      ) : (
-        <View style={styles.loadingContainer}>
-          <Text>Đang lấy vị trí của bạn...</Text>
-        </View>
       )}
-
-      {/* Nút quay về vị trí hiện tại */}
-      <TouchableOpacity style={styles.recenterButton} onPress={onRecenter}>
-        <Ionicons name="navigate" size={24} color="#fff" />
-      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+    flex: 1,
   },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  loadingContainer: {
+  center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
-  calloutContainer: {
-    width: 200,
-    padding: 10,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    borderColor: '#ccc',
-    borderWidth: 1,
-  },
-  calloutTitle: {
-    fontWeight: 'bold',
+  loadingText: {
+    marginTop: 10,
     fontSize: 16,
+    color: 'gray',
   },
-  calloutAddress: {
-    fontSize: 12,
-    color: '#666',
-    marginVertical: 4,
+  errorText: {
+    fontSize: 16,
+    color: 'red',
+    textAlign: 'center'
   },
-  calloutAction: {
-    color: '#3498db',
-    textAlign: 'center',
-    marginTop: 5,
-  },
-  recenterButton: {
-    position: 'absolute',
-    bottom: 30,
-    right: 20,
+  markerContainer: {
     backgroundColor: '#3498db',
-    padding: 15,
-    borderRadius: 30,
-    elevation: 5,
-  },
+    padding: 8,
+    borderRadius: 20,
+    borderColor: 'white',
+    borderWidth: 2,
+  }
 });
 
 export default MapScreen;

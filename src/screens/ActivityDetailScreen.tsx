@@ -1,17 +1,20 @@
-// src/screens/ActivityDetailScreen.tsx
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, Image, TouchableOpacity, Alert } from 'react-native';
-import { RouteProp, useRoute } from '@react-navigation/native';
-import { RootStackParamList } from '../navigation/types';
-import Icon from 'react-native-vector-icons/Feather';
-import DottedLine from '../components/DottedLine';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRoute } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import { ActivityDetailScreenRouteProp } from '../navigation/types';
 
-type ActivityDetailScreenRouteProp = RouteProp<RootStackParamList, 'ActivityDetail'>;
+// Import các component mới
+import RatingStars from '../components/RatingStars';
+import InfoRow from '../components/InfoRow';
+import Button from '../components/Button';
 
-const InfoDetailRow = ({ label, value }: { label: string; value: string }) => (
-  <View style={styles.detailRow}>
-    <Text style={styles.detailLabel}>{label}</Text>
-    <Text style={styles.detailValue}>{value}</Text>
+// Component con để code gọn gàng
+const Section = ({ children, title }: { children: React.ReactNode; title?: string }) => (
+  <View style={styles.sectionContainer}>
+    {title && <Text style={styles.sectionTitle}>{title}</Text>}
+    {children}
   </View>
 );
 
@@ -20,142 +23,179 @@ const ActivityDetailScreen = () => {
   const { activity } = route.params;
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.ticketContainer}>
-          {/* Phần trên của vé */}
-          <View style={styles.ticketTop}>
-            <Image source={activity.imageUrl} style={styles.image} />
-            <Text style={styles.name}>{activity.name}</Text>
+    <SafeAreaView style={styles.safeArea} edges={['bottom']}>
+      <ScrollView style={styles.scrollView}>
+        {/* === PHẦN 1: TRẠNG THÁI === */}
+        <View style={[styles.container, styles.statusContainer]}>
+          <View style={styles.iconWrapper}>
+            <Ionicons
+              name={activity.vehicleType === 'car' ? 'car-sport' : 'bicycle'}
+              size={50}
+              color="#3498db"
+            />
+            <View style={styles.checkIcon}>
+              <Ionicons name="checkmark-circle" size={24} color="#2ecc71" />
+            </View>
           </View>
-
-          <DottedLine />
-
-          {/* Phần giữa của vé */}
-          <View style={styles.ticketMiddle}>
-            <InfoDetailRow label="Biển số xe" value={activity.licensePlate} />
-            <InfoDetailRow label="Loại xe" value={activity.vehicleType} />
-            <InfoDetailRow label="Thời gian vào" value={`${activity.date} - 14:00`} />
-            <InfoDetailRow label="Thời gian ra" value={`${activity.date} - 16:00`} />
-            <InfoDetailRow label="Trạng thái" value={activity.status} />
-          </View>
-          
-          <DottedLine />
-
-          {/* Phần QR Code */}
-          <View style={styles.qrContainer}>
-            <Image source={require('../assets/image/home_banner.png')} style={styles.qrImage} />
-            <Text style={styles.qrInstruction}>Đưa mã này cho nhân viên để xác nhận</Text>
-          </View>
+          <Text style={styles.statusText}>{activity.status}</Text>
+          <RatingStars rating={activity.userRating} size={28} />
         </View>
 
-        {/* Các nút hành động */}
-        <View style={styles.actionsContainer}>
-            <TouchableOpacity style={styles.actionButton} onPress={() => Alert.alert('Lưu ảnh', 'Đã lưu vé vào thư viện ảnh!')}>
-                <Icon name="download" size={20} color="#3498db" />
-                <Text style={styles.actionText}>Lưu ảnh</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton} onPress={() => Alert.alert('Chia sẻ', 'Chia sẻ vé thành công!')}>
-                <Icon name="share-2" size={20} color="#3498db" />
-                <Text style={styles.actionText}>Chia sẻ</Text>
-            </TouchableOpacity>
+        {/* === PHẦN 2 & 3: THÔNG TIN & THANH TOÁN === */}
+        <View style={[styles.container, { marginTop: 10 }]}>
+          <Section>
+            <InfoRow label="Mã đơn" value={activity.orderId} isCopyable />
+            <InfoRow label="Khách hàng" value={activity.userName} />
+            <InfoRow label="Biển số xe" value={activity.vehicleLicensePlate} />
+            <InfoRow label="Loại xe" value={activity.vehicleInfo} />
+          </Section>
+
+          <View style={styles.divider} />
+
+          <Section>
+            <View style={styles.parkingInfoRow}>
+              <Image source={activity.parkingImageUrl} style={styles.parkingImage} />
+              <View style={styles.parkingTextContainer}>
+                <Text style={styles.parkingName}>{activity.parkingName}</Text>
+                <Text style={styles.parkingSlot}>Vị trí: {activity.slot}</Text>
+                <Text style={styles.parkingAddress} numberOfLines={2}>{activity.parkingAddress}</Text>
+              </View>
+            </View>
+            <View style={styles.timeInfoRow}>
+              <Ionicons name="hourglass-outline" size={70} color="gray" />
+              <View style={styles.timeTextContainer}>
+                <Text style={styles.timeLabel}>Giờ vào:</Text>
+                <Text style={styles.timeLabel}>{activity.startTime} - {activity.date}</Text>
+                <Text style={styles.timeLabel}>Giờ ra:</Text>
+                <Text style={styles.timeLabel}>{activity.endTime} - {activity.date}</Text>
+              </View>
+            </View>
+          </Section>
+
+          <View style={styles.divider} />
+
+          <Section title="Thông tin thanh toán">
+            <InfoRow label="Phương thức" value={activity.paymentMethod} />
+            <InfoRow label="Giờ đặt trước" value={activity.prepaidHours} />
+            <InfoRow label="Thêm giờ" value={activity.extraHours} />
+            <InfoRow label="Tổng cộng" value={`${activity.total.toLocaleString('vi-VN')}đ`} />
+          </Section>
         </View>
 
+        {/* === PHẦN 4: NÚT BẤM === */}
+        <View style={[styles.container, styles.buttonContainer]}>
+          <Button title="Liên hệ" onPress={() => { }} type="secondary" style={{ flex: 1, marginRight: 10 }} />
+          <Button title="Đặt lại" onPress={() => { }} style={{ flex: 1 }} />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
-
+// ... Styles
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f0f2f5',
+    backgroundColor: '#f4f6f9',
   },
-  scrollContainer: {
-    padding: 20,
+  scrollView: {
+    flex: 1,
   },
-  ticketContainer: {
+  container: {
     backgroundColor: 'white',
-    borderRadius: 15,
-    padding: 20,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    borderRadius: 12,
+    marginHorizontal: 16,
+    marginTop: 16,
+    padding: 16,
   },
-  ticketTop: {
+  // Phần 1
+  statusContainer: {
     alignItems: 'center',
+    paddingVertical: 24,
   },
-  image: {
+  iconWrapper: {
     width: 80,
     height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#eaf5ff',
     borderRadius: 40,
-    borderWidth: 2,
-    borderColor: '#e0e0e0',
+    marginBottom: 12,
   },
-  name: {
-    fontSize: 22,
+  checkIcon: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: 'white',
+    borderRadius: 12,
+  },
+  statusText: {
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
-    marginTop: 10,
-    textAlign: 'center',
+    color: '#2ecc71',
+    marginBottom: 8,
   },
-  ticketMiddle: {
-    paddingVertical: 10,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  // Phần 2 & 3
+  sectionContainer: {
     paddingVertical: 8,
   },
-  detailLabel: {
-    fontSize: 16,
-    color: '#666',
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
   },
-  detailValue: {
+  divider: {
+    height: 1,
+    backgroundColor: '#f0f0f0',
+    marginVertical: 8,
+  },
+  parkingInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  parkingImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 8,
+  },
+  parkingTextContainer: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  parkingName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  parkingSlot: {
+    fontSize: 14,
+    color: '#3498db',
+    marginVertical: 2,
+  },
+  parkingAddress: {
+    fontSize: 14,
+    color: 'gray',
+  },
+  timeInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  timeTextContainer: {
+    marginLeft: 12,
+  },
+  timeLabel: {
     fontSize: 16,
     color: '#333',
-    fontWeight: '600',
   },
-  qrContainer: {
-    alignItems: 'center',
-    paddingTop: 10,
-  },
-  qrImage: {
-    width: 180,
-    height: 180,
-  },
-  qrInstruction: {
-    marginTop: 10,
-    fontSize: 14,
-    color: '#888',
-    textAlign: 'center',
-  },
-  actionsContainer: {
+  // Phần 4
+  buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 20,
+    justifyContent: 'space-between',
+    padding: 16,
+    marginBottom: 16,
   },
-  actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 25,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  actionText: {
-    marginLeft: 8,
-    fontSize: 16,
-    color: '#3498db',
-    fontWeight: 'bold',
-  }
 });
 
 export default ActivityDetailScreen;

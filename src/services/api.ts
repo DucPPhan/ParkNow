@@ -126,6 +126,36 @@ const api = {
             return { success: false, message: 'Không thể kết nối đến máy chủ.' };
         }
     },
+
+    /**
+     * Lấy danh sách bãi xe gần vị trí người dùng
+     * @param latitude Vĩ độ của người dùng
+     * @param longitude Kinh độ của người dùng
+     */
+    getNearbyParkings: async (latitude: number, longitude: number) => {
+        try {
+            const token = await SecureStore.getItemAsync('userToken');
+            const response = await fetch(`${API_ENDPOINT}/parking-nearest?currentLatitude=${latitude}&currentLongtitude=${longitude}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // API này yêu cầu xác thực, nên chúng ta cần gửi token
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            const responseData = await logAndParseResponse(response);
+            
+            if (response.ok && responseData.statusCode === 200 && responseData.data) {
+                return { success: true, data: responseData.data };
+            } else {
+                return { success: false, message: responseData.message || 'Lấy danh sách bãi xe gần đây thất bại.' };
+            }
+        } catch (error) {
+            console.error('Get Nearby Parkings API error:', error);
+            return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+        }
+    },
 };
 
 export default api;

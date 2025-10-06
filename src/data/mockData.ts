@@ -1,6 +1,6 @@
 // src/data/mockData.ts
 import { Vehicle } from '../navigation/types';
-import { ActivityItem } from '../screens/ActivityScreen';
+import { Activity } from '../components/ActivityCard';
 
 // Thêm tọa độ vào đây
 export const PARKING_DATA = [
@@ -10,11 +10,41 @@ export const PARKING_DATA = [
   { id: '4', name: 'Dinh Độc Lập', address: '135 Nam Kỳ Khởi Nghĩa, Q. 1', rating: 4.8, imageUrl: require('../assets/image/home_banner.png'), coordinate: { latitude: 10.7770, longitude: 106.6953 }, tags: ['Trả trước', 'Xe máy'], isFavorite: false, price: 15000},
 ];
 
-export const UPCOMING_DATA: ActivityItem[] = [
-    { id: '1', name: 'Bãi xe Ga Sài Gòn', date: '24/09/2025', time: '14:00 - 16:00', status: 'Sắp tới', imageUrl: require('../assets/image/home_banner.png'), licensePlate: '51A-123.45', vehicleType: 'Ô tô'},
+export const UPCOMING_DATA: Activity[] = [
+    {
+      id: '1', parkingName: 'Bãi xe Ga Sài Gòn', date: '24/09/2025', time: '14:00 - 16:00', status: 'Đang diễn ra', vehicleType: 'car',
+      vehicleInfo: '',
+      vehicleLicensePlate: '',
+      parkingAddress: '',
+      slot: '',
+      orderId: '',
+      userName: '',
+      userRating: 0,
+      startTime: '',
+      endTime: '',
+      paymentMethod: '',
+      prepaidHours: '',
+      extraHours: '',
+      total: 0
+    },
 ];
-export const HISTORY_DATA: ActivityItem[] = [
-    { id: '2', name: 'Bãi xe Nowzone', date: '15/09/2025', time: '09:00 - 11:30', status: 'Hoàn thành', imageUrl: require('../assets/image/home_banner.png'), licensePlate: '72D-543.21', vehicleType: 'Xe máy'},
+export const HISTORY_DATA: Activity[] = [
+    {
+      id: '2', parkingName: 'Bãi xe Nowzone', date: '15/09/2025', time: '09:00 - 11:30', status: 'Hoàn thành', vehicleType: 'motorcycle',
+      vehicleInfo: '',
+      vehicleLicensePlate: '',
+      parkingAddress: '',
+      slot: '',
+      orderId: '',
+      userName: '',
+      userRating: 0,
+      startTime: '',
+      endTime: '',
+      paymentMethod: '',
+      prepaidHours: '',
+      extraHours: '',
+      total: 0
+    },
 ];
 
 export const VEHICLES_DATA: Vehicle[] = [

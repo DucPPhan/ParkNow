@@ -2,7 +2,7 @@
 import type { StackNavigationProp } from '@react-navigation/stack';
 import type { RouteProp, NavigatorScreenParams } from '@react-navigation/native';
 // Sửa đường dẫn import ở đây
-import { ActivityItem } from '../screens/ActivityScreen';
+import { Activity } from '../components/ActivityCard';
 
 export type Vehicle = {
     id: string;
@@ -26,7 +26,7 @@ export type RootStackParamList = {
   MainApp: NavigatorScreenParams<MainTabParamList>;
   ParkingList: { title: string };
   ParkingDetail: { parkingId: string; name: string };
-  ActivityDetail: { activity: ActivityItem };
+  ActivityDetail: { activity: Activity };
   PersonalInformation: undefined;
   Vehicles: undefined;
   Wallet: undefined;
