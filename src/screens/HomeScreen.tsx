@@ -28,7 +28,7 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <LocationBar />
+      <LocationBar navigation={navigation} />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: showBookingBar ? 90 : 10 }} // Thêm padding để không bị thanh booking che

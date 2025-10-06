@@ -34,6 +34,7 @@ export type RootStackParamList = {
   VehicleDetail: { vehicle: Vehicle };
   Booking: { parkingId: string; parkingName: string };
   RegistrationFlow: undefined;
+  Notification: undefined;
 };
 
 // Kiểu cho navigation prop ở các màn hình khác nhau
