@@ -34,7 +34,7 @@ const MainTabNavigator = () => {
           // SỬA LỖI: Sử dụng component <Ionicons />
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#00B14F', // Màu xanh lá khi được chọn
+        tabBarActiveTintColor: '#3498db', // Màu xanh lá khi được chọn
         tabBarInactiveTintColor: 'gray',
         headerShown: false,
       })}

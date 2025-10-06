@@ -1,116 +1,93 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  View,
-  Text,
   StyleSheet,
   SafeAreaView,
   ScrollView,
   Image,
   FlatList,
-  TouchableOpacity,
-  StatusBar,
+  View,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { CompositeNavigationProp } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { RootStackParamList, MainTabParamList } from '../navigation/types';
-
-import SearchBar from '../components/SearchBar';
-import ParkingCard from '../components/ParkingCard';
-import ParkingListItem from '../components/ParkingListItem';
-// SỬA LỖI: Import đúng tên biến 'parkings'
+import { RootStackParamList } from '../navigation/types';
 import { PARKING_DATA } from '../data/mockData';
 
-type ParentNavigationProp = StackNavigationProp<RootStackParamList>;
-type CurrentScreenNavigationProp = BottomTabNavigationProp<MainTabParamList, 'HomeTab'>;
-type HomeScreenNavigationProp = CompositeNavigationProp<
-  ParentNavigationProp,
-  CurrentScreenNavigationProp
->;
+// Import các component mới
+import LocationBar from '../components/home/LocationBar';
+import SectionHeader from '../components/home/SectionHeader';
+import NearbyCard from '../components/home/NearbyCard';
+import FeaturedListItem from '../components/home/FeaturedListItem';
+import CurrentBookingBar from '../components/home/CurrentBookingBar';
 
-type Props = {
-  navigation: HomeScreenNavigationProp;
-};
 
-// SỬA LỖI: Đổi tên prop 'onSeeAll_press' thành 'onSeeAllPress'
-const SectionHeader = ({ title, onSeeAllPress }: { title: string; onSeeAllPress: () => void }) => (
-  <View style={styles.sectionHeaderContainer}>
-    <Text style={styles.sectionTitle}>{title}</Text>
-    <TouchableOpacity onPress={onSeeAllPress}>
-      <Text style={styles.seeAllText}>Xem tất cả</Text>
-    </TouchableOpacity>
-  </View>
-);
+type NavigationProp = StackNavigationProp<RootStackParamList>;
 
-const HomeScreen = ({ navigation }: Props) => {
-  // SỬA LỖI: Sử dụng đúng tên biến 'parkings'
-  const nearbyParkings = PARKING_DATA.slice(0, 4);
-  const topRatedParkings = PARKING_DATA.slice(0, 4);
+const HomeScreen = () => {
+  const navigation = useNavigation<NavigationProp>();
+  const [showBookingBar, setShowBookingBar] = useState(true);
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.welcomeText}>Chào buổi sáng,</Text>
-            <Text style={styles.userName}>ParkNow User</Text>
-          </View>
-          <TouchableOpacity onPress={() => console.log('Navigate to Notifications')}>
-            <Ionicons name="notifications-outline" size={26} color="#333" />
-          </TouchableOpacity>
-        </View>
-
-        <SearchBar onPress={() => console.log('Navigate to Search')} />
-
+      <LocationBar />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: showBookingBar ? 90 : 10 }} // Thêm padding để không bị thanh booking che
+      >
         <Image
           source={require('../assets/image/home_banner.png')}
           style={styles.banner}
         />
 
-        {/* Top Rated List */}
-        <View style={styles.section}>
-          <TouchableOpacity style={styles.sectionHeader} onPress={() => navigation.navigate('ParkingList', { title: 'Đánh giá cao' })}>
-            <Text style={styles.sectionTitle}>Đánh giá cao</Text>
-            <Text style={styles.seeAll}>Xem thêm</Text>
-          </TouchableOpacity>
-          <FlatList
-            data={topRatedParkings}
-            renderItem={({ item }) => (
-              <ParkingCard
-                item={item}
-                onPress={() => navigation.navigate('ParkingDetail', { parkingId: item.id, name: item.name })}
-              />
-            )}
-            keyExtractor={item => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.listContainer}
-          />
-        </View>
+        {/* Mục "Gần đây" */}
+        <SectionHeader
+          title="Gần đây"
+          onSeeAll={() => navigation.navigate('ParkingList', { title: 'Gần đây' })}
+        />
+        <FlatList
+          data={PARKING_DATA}
+          renderItem={({ item }) => (
+            <NearbyCard
+              item={item}
+              onPress={() => navigation.navigate('ParkingDetail', { parkingId: item.id, name: item.name })}
+            />
+          )}
+          keyExtractor={item => item.id}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.horizontalList}
+        />
 
-        {/* Nearby List */}
-        <View style={styles.section}>
-          <TouchableOpacity style={styles.sectionHeader} onPress={() => navigation.navigate('ParkingList', { title: 'Bãi xe gần đây' })}>
-            <Text style={styles.sectionTitle}>Bãi xe gần đây</Text>
-            <Text style={styles.seeAll}>Xem thêm</Text>
-          </TouchableOpacity>
-          <FlatList
-            data={nearbyParkings}
-            renderItem={({ item }) => (
-              <ParkingCard
-                item={item}
-                onPress={() => navigation.navigate('ParkingDetail', { parkingId: item.id, name: item.name })}
-              />
-            )}
-            keyExtractor={item => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.listContainer}
-          />
+        {/* Mục "Danh sách nổi bật" */}
+        <SectionHeader
+          title="Danh sách nổi bật"
+          onSeeAll={() => navigation.navigate('ParkingList', { title: 'Danh sách nổi bật' })}
+        />
+        <View style={styles.verticalList}>
+          {PARKING_DATA.map((item: {
+            id: string;
+            name: string;
+            address: string;
+            rating: number;
+            imageUrl: any;
+            coordinate: {
+              latitude: number;
+              longitude: number;
+            };
+            tags: string[];
+            isFavorite: boolean;
+            price: number;
+          }) => (
+            <FeaturedListItem
+              key={item.id}
+              item={item}
+              onPress={() => navigation.navigate('ParkingDetail', { parkingId: item.id, name: item.name })}
+            />
+          ))}
         </View>
       </ScrollView>
+
+      {/* Thanh đặt chỗ hiện tại */}
+      {showBookingBar && <CurrentBookingBar onClose={() => setShowBookingBar(false)} />}
     </SafeAreaView>
   );
 };
@@ -118,74 +95,20 @@ const HomeScreen = ({ navigation }: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 10,
-    paddingBottom: 10,
-  },
-  welcomeText: {
-    fontSize: 16,
-    color: '#8A8A8E',
-  },
-  userName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1C1C1E',
+    backgroundColor: '#f8f9fa', // Màu nền xám nhẹ
   },
   banner: {
-    width: '90%',
-    height: 140,
+    width: '92%',
+    height: 150,
     borderRadius: 15,
     alignSelf: 'center',
     marginTop: 10,
   },
-  sectionHeaderContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    marginTop: 24,
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1C1C1E',
-  },
-  seeAllText: {
-    fontSize: 14,
-    color: '#007AFF',
-  },
   horizontalList: {
-    paddingLeft: 24,
-    paddingRight: 8,
+    paddingLeft: 16,
   },
   verticalList: {
-    paddingHorizontal: 24,
-  },
-  section: {
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginHorizontal: 20,
-    marginBottom: 15,
-  },
-  seeAll: {
-    fontSize: 15,
-    color: '#3498db',
-    fontWeight: '600',
-  },
-  listContainer: {
-    paddingLeft: 20,
+    paddingHorizontal: 16,
   },
 });
 
