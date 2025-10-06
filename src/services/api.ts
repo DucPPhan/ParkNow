@@ -101,6 +101,31 @@ const api = {
             return { success: false, message: 'Không thể kết nối đến máy chủ.' };
         }
     },
+
+    /**
+     * Lấy danh sách bãi xe nổi bật (sắp xếp theo rating từ API)
+     */
+    getFeaturedParkings: async (pageNo = 1, pageSize = 50) => { // Lấy nhiều để có dữ liệu sắp xếp
+        try {
+            const response = await fetch(`${API_ENDPOINT}/parkings-for-cus/ratings?PageNo=${pageNo}&PageSize=${pageSize}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const responseData = await logAndParseResponse(response);
+            
+            if (response.ok && responseData.statusCode === 200 && responseData.data) {
+                return { success: true, data: responseData.data };
+            } else {
+                return { success: false, message: responseData.message || 'Lấy danh sách nổi bật thất bại.' };
+            }
+        } catch (error) {
+            console.error('Get Featured Parkings API error:', error);
+            return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+        }
+    },
 };
 
 export default api;
