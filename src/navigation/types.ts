@@ -38,6 +38,10 @@ export type RootStackParamList = {
   Booking: { parkingId: string; parkingName: string };
   RegistrationFlow: undefined;
   Notification: undefined;
+  FavoriteAddress: undefined;
+  Help: undefined;
+  Settings: undefined;
+  AboutUs: undefined;
 };
 
 // Kiểu cho navigation prop ở các màn hình khác nhau

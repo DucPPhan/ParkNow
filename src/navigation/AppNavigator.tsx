@@ -19,6 +19,10 @@ import OnboardingScreen from '../screens/OnboardingScreen.tsx';
 import RegistrationNavigator from './RegistrationNavigator.tsx';
 import NotificationScreen from '../screens/NotificationScreen.tsx';
 import { TouchableOpacity, Text } from 'react-native';
+import FavoriteAddressesScreen from '../screens/FavoriteAddressesScreen.tsx';
+import HelpScreen from '../screens/HelpScreen.tsx';
+import SettingsScreen from '../screens/SettingsScreen.tsx';
+import AboutUsScreen from '../screens/AboutUsScreen.tsx';
 
 const Stack = createStackNavigator<RootStackParamList>(); // Sử dụng kiểu ở đây
 
@@ -62,6 +66,26 @@ const AppNavigator = () => {
               </TouchableOpacity>
             ),
           })}
+        />
+        <Stack.Screen
+          name="FavoriteAddress"
+          component={FavoriteAddressesScreen}
+          options={{ title: 'Địa chỉ yêu thích' }}
+        />
+        <Stack.Screen
+          name="Help"
+          component={HelpScreen}
+          options={{ title: 'Trợ giúp & Hỗ trợ' }}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={{ title: 'Cài đặt' }}
+        />
+        <Stack.Screen
+          name="AboutUs"
+          component={AboutUsScreen}
+          options={{ title: 'Về chúng tôi' }}
         />
         <Stack.Screen name="Vehicles" component={VehiclesScreen} options={{ title: 'Phương tiện' }} />
         <Stack.Screen name="Wallet" component={WalletScreen} options={{ title: 'Ví ParkNow' }} />

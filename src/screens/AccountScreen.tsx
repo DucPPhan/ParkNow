@@ -132,7 +132,7 @@ const AccountScreen = ({ navigation }: Props) => {
           <ProfileMenuItem
             icon="heart-outline"
             title="Địa chỉ yêu thích"
-            onPress={() => { /* Thêm navigation khi có màn hình */ }}
+            onPress={() => navigation.navigate('FavoriteAddress')}
           />
         </View>
 
@@ -141,19 +141,19 @@ const AccountScreen = ({ navigation }: Props) => {
           <ProfileMenuItem
             icon="help-circle-outline"
             title="Trợ giúp & Hỗ trợ"
-            onPress={() => { }}
+            onPress={() => navigation.navigate('Help')}
           />
           <View style={styles.divider} />
           <ProfileMenuItem
             icon="settings-outline"
             title="Cài đặt"
-            onPress={() => { }}
+            onPress={() => navigation.navigate('Settings')}
           />
           <View style={styles.divider} />
           <ProfileMenuItem
             icon="information-circle-outline"
             title="Về chúng tôi"
-            onPress={() => { }}
+            onPress={() => navigation.navigate('AboutUs')}
           />
         </View>
 

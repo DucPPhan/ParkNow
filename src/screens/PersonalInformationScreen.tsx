@@ -19,11 +19,16 @@ import ProfileInfoRow from '../components/ProfileInfoRow';
 import { Ionicons } from '@expo/vector-icons';
 
 interface UserProfile {
+  userId: number;
   name: string;
   phone: string;
   avatar: string | null;
-  gender: string;
   dateOfBirth: string;
+  gender: string;
+  idCardNo: string;
+  idCardDate: string;
+  idCardIssuedBy: string;
+  address: string;
 }
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'PersonalInformation'>;
@@ -37,6 +42,8 @@ const PersonalInformationScreen = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   
   const [loading, setLoading] = useState(true);
+
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -60,13 +67,38 @@ const PersonalInformationScreen = () => {
   const isModified = originalProfile && profile ? JSON.stringify(originalProfile) !== JSON.stringify(profile) : false;
 
   // Memoize handleSaveChanges to avoid infinite update loop
-  const handleSaveChanges = useCallback(() => {
-    if (!profile) return;
-    console.log('Đang lưu:', profile);
-    // TODO: Gọi API PUT để cập nhật thông tin
-    Alert.alert('Thành công', 'Đã cập nhật thông tin cá nhân!');
-    navigation.goBack();
-  }, [profile, navigation]);
+  const handleSaveChanges = useCallback(async () => {
+    if (!profile || !isModified) return;
+
+    setIsSaving(true);
+
+    // Chuẩn bị payload đúng theo yêu cầu của API
+    const updateUserProfile = {
+      userId: profile.userId,
+      name: profile.name,
+      avatar: profile.avatar,
+      dateOfBirth: new Date(profile.dateOfBirth).toISOString(),
+      gender: profile.gender,
+      address: profile.address,
+    };
+
+    try {
+      const result = await api.updateUserProfile(updateUserProfile);
+      setIsSaving(false);
+
+      if (result.success) {
+        Alert.alert('Thành công', 'Đã cập nhật thông tin cá nhân!');
+        // navigation.goBack();
+      } else {
+        Alert.alert('Cập nhật thất bại', result.message || 'Đã có lỗi xảy ra.');
+      }
+    } catch (error: any) {
+      setIsSaving(false);
+      Alert.alert('Lỗi', 'Không thể cập nhật thông tin. Vui lòng thử lại sau.');
+      // Optional: log error for debugging
+      // console.error('Update profile error:', error);
+    }
+  }, [profile, navigation, isModified]);
 
   // Gửi hàm handleSaveChanges và trạng thái isModified lên header
   useLayoutEffect(() => {
