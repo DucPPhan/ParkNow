@@ -156,6 +156,39 @@ const api = {
             return { success: false, message: 'Không thể kết nối đến máy chủ.' };
         }
     },
+
+    /**
+     * Lấy thông tin hồ sơ của người dùng bằng ID
+     * @param userId ID của người dùng
+     */
+    getUserProfile: async () => {
+        try {
+            const token = await SecureStore.getItemAsync('userToken');
+            if (!token) {
+                return { success: false, message: 'Người dùng chưa đăng nhập.' };
+            }
+
+            const response = await fetch(`${API_ENDPOINT}/mobile/account`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            
+            const responseData = await logAndParseResponse(response);
+
+            if (response.ok && responseData.statusCode === 200 && responseData.data) {
+                return { success: true, data: responseData.data };
+            } else {
+                return { success: false, message: responseData.message || 'Lấy thông tin thất bại.' };
+            }
+
+        } catch (error) {
+            console.error('Get Profile API error:', error);
+            return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+        }
+    },
 };
 
 export default api;

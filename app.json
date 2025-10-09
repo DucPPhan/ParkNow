@@ -5,5 +5,13 @@
     "eas": {
       "projectId": "fbfca406-15f6-443b-8053-4d7e869cb661"
     }
-  }
+  },
+  "plugins": [
+    [
+      "expo-image-picker",
+      {
+        "photosPermission": "Ứng dụng cần truy cập thư viện ảnh để bạn có thể chọn ảnh đại diện."
+      }
+    ]
+  ]
 }

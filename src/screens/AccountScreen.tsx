@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -20,8 +21,53 @@ type AccountScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Main
 type Props = {
   navigation: AccountScreenNavigationProp;
 };
-
+interface UserProfile {
+  userId: number;
+  name: string;
+  phone: string;
+  avatar: string | null;
+  dateOfBirth: string;
+  gender: string;
+  idCardNo: string;
+  idCardDate: string;
+  idCardIssuedBy: string;
+  address: string;
+}
 const AccountScreen = ({ navigation }: Props) => {
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoading(true);
+      const result = await api.getUserProfile();
+
+      if (result.success) {
+        setProfile(result.data);
+      } else {
+        Alert.alert('Lỗi', result.message || 'Không thể tải thông tin người dùng.');
+      }
+      setLoading(false);
+    };
+
+    fetchProfile();
+  }, []);
+
+  if (loading) {
+      return (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color="#3498db" />
+          <Text>Đang tải dữ liệu...</Text>
+        </View>
+      );
+    }
+  
+    if (!profile) {
+      return (
+        <View style={styles.center}>
+          <Text>Không thể tải thông tin cá nhân.</Text>
+        </View>
+      );
+    }
 
   const handleLogout = () => {
     Alert.alert(
@@ -57,12 +103,12 @@ const AccountScreen = ({ navigation }: Props) => {
           onPress={() => navigation.navigate('PersonalInformation')}
         >
           <Image
-            source={{ uri: `https://i.pravatar.cc/150?u=a042581f4e29026704d` }}
+            source={{ uri: profile.avatar ||  `https://i.pravatar.cc/150?u=a042581f4e29026704d` }}
             style={styles.avatar}
           />
           <View style={styles.profileInfo}>
-            <Text style={styles.userName}>ParkNow User</Text>
-            <Text style={styles.userPhone}>+84 123 456 789</Text>
+            <Text style={styles.userName}>{profile.name}</Text>
+            <Text style={styles.userPhone}>{profile.phone}</Text>
           </View>
           <Ionicons name="chevron-forward" size={24} color="#ccc" />
         </TouchableOpacity>
@@ -190,6 +236,11 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#f0f0f0',
     marginLeft: 60, // Căn lề với vị trí của text
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

@@ -5,11 +5,11 @@ import type { RouteProp, NavigatorScreenParams } from '@react-navigation/native'
 import { Activity } from '../components/ActivityCard';
 
 export type Vehicle = {
-    id: string;
-    name: string;
-    plate: string;
-    type: 'car' | 'motorcycle';
-    isDefault: boolean;
+  id: string;
+  name: string;
+  plate: string;
+  type: 'car' | 'motorcycle';
+  isDefault: boolean;
 };
 
 export type MainTabParamList = {
@@ -27,7 +27,10 @@ export type RootStackParamList = {
   ParkingList: { title: string };
   ParkingDetail: { parkingId: string; name: string };
   ActivityDetail: { activity: Activity };
-  PersonalInformation: undefined;
+  PersonalInformation: {
+    handleSave?: () => void;
+    canSave?: boolean;
+  } | undefined;
   Vehicles: undefined;
   Wallet: undefined;
   AddVehicle: undefined;

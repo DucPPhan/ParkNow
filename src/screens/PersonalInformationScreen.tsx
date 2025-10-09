@@ -1,93 +1,151 @@
-// src/screens/PersonalInformationScreen.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   Image,
   Alert,
+  ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
-import FormInput from '../components/FormInput';
-import Button from '../components/Button';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import * as ImagePicker from 'expo-image-picker';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import api from '../services/api';
+import { RootStackParamList } from '../navigation/types';
+import ProfileInfoRow from '../components/ProfileInfoRow';
+import { Ionicons } from '@expo/vector-icons';
+
+interface UserProfile {
+  name: string;
+  phone: string;
+  avatar: string | null;
+  gender: string;
+  dateOfBirth: string;
+}
+
+type NavigationProp = StackNavigationProp<RootStackParamList, 'PersonalInformation'>;
 
 const PersonalInformationScreen = () => {
-  // Sử dụng state để quản lý giá trị của các trường input
-  const [fullName, setFullName] = useState('Lê Văn A');
-  const [phone, setPhone] = useState('0901234567');
-  const [email, setEmail] = useState('levana@email.com');
-  const [gender, setGender] = useState('Nam');
-  const [dob, setDob] = useState('01/01/1990');
+  const navigation = useNavigation<NavigationProp>();
 
-  const handleSaveChanges = () => {
-    // Logic lưu thay đổi sẽ được xử lý ở đây
+  // State cho dữ liệu gốc (không thay đổi)
+  const [originalProfile, setOriginalProfile] = useState<UserProfile | null>(null);
+  // State cho dữ liệu đang chỉnh sửa
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoading(true);
+      const result = await api.getUserProfile();
+
+      if (result.success) {
+        // Gán dữ liệu cho cả 2 state khi fetch thành công
+        setProfile(result.data);
+        setOriginalProfile(result.data);
+      } else {
+        Alert.alert('Lỗi', result.message || 'Không thể tải thông tin.');
+      }
+      setLoading(false);
+    };
+
+    fetchProfile();
+  }, []);
+
+  // So sánh dữ liệu gốc và dữ liệu hiện tại để xác định có thay đổi hay không
+  const isModified = originalProfile && profile ? JSON.stringify(originalProfile) !== JSON.stringify(profile) : false;
+
+  // Memoize handleSaveChanges to avoid infinite update loop
+  const handleSaveChanges = useCallback(() => {
+    if (!profile) return;
+    console.log('Đang lưu:', profile);
+    // TODO: Gọi API PUT để cập nhật thông tin
     Alert.alert('Thành công', 'Đã cập nhật thông tin cá nhân!');
+    navigation.goBack();
+  }, [profile, navigation]);
+
+  // Gửi hàm handleSaveChanges và trạng thái isModified lên header
+  useLayoutEffect(() => {
+    navigation.setParams({ 
+      handleSave: handleSaveChanges,
+      canSave: isModified, // Gửi trạng thái có thể lưu hay không
+    });
+  }, [navigation, isModified, handleSaveChanges]); // Effect chạy lại khi isModified hoặc handleSaveChanges thay đổi
+
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setProfile(prev => prev ? { ...prev, avatar: result.assets[0].uri } : null);
+    }
   };
 
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+  };
+
+  if (loading) {
+    return <View style={styles.center}><ActivityIndicator size="large" color="#00B14F" /></View>;
+  }
+
+  if (!profile) {
+    return <View style={styles.center}><Text>Không thể tải thông tin.</Text></View>;
+  }
+
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Image
-            source={require('../assets/image/home_banner.png')}
-            style={styles.avatar}
-          />
-          <Text style={styles.headerText}>Chỉnh sửa thông tin</Text>
+        <View style={styles.avatarSection}>
+          <TouchableOpacity onPress={pickImage}>
+            <Image
+              source={profile.avatar ? { uri: profile.avatar } : require('../assets/image/home_banner.png')}
+              style={styles.avatar}
+            />
+            <View style={styles.cameraIcon}>
+              <Ionicons name="camera" size={20} color="#fff" />
+            </View>
+          </TouchableOpacity>
         </View>
 
-        {/* Form */}
         <View style={styles.formContainer}>
-          <FormInput
+          <ProfileInfoRow
             label="Họ và tên"
-            icon="person"
-            value={fullName}
-            onChangeText={setFullName}
-            placeholder="Nhập họ và tên của bạn"
+            icon="person-outline"
+            value={profile.name}
+            onChangeText={(text) => setProfile(prev => prev ? { ...prev, name: text } : null)}
           />
-          <FormInput
+          <View style={styles.divider} />
+          <ProfileInfoRow
             label="Số điện thoại"
-            icon="phone-landscape"
-            value={phone}
-            onChangeText={setPhone}
-            placeholder="Nhập số điện thoại"
-            keyboardType="phone-pad"
+            icon="call-outline"
+            value={profile.phone}
+            editable={false}
           />
-          <FormInput
-            label="Email"
-            icon="mail"
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Nhập email"
-            keyboardType="email-address"
-            editable={false} // Không cho sửa email
-          />
-          <FormInput
+          <View style={styles.divider} />
+          <ProfileInfoRow
             label="Giới tính"
-            icon="people-outline"
-            value={gender}
-            onChangeText={setGender}
-            placeholder="Chọn giới tính"
+            icon="male-female-outline"
+            value={profile.gender}
+            onChangeText={(text) => setProfile(prev => prev ? { ...prev, gender: text } : null)}
           />
-          <FormInput
+          <View style={styles.divider} />
+          <ProfileInfoRow
             label="Ngày sinh"
-            icon="calendar"
-            value={dob}
-            onChangeText={setDob}
-            placeholder="DD/MM/YYYY"
-          />
-        </View>
-
-        {/* Save Button */}
-        <View style={styles.buttonContainer}>
-          <Button
-            title="Lưu thay đổi"
-            onPress={handleSaveChanges}
-            // backgroundColor="#3498db"
-            // textColor="#ffffff"
-            // minWidth={'100%'}
-            // borderRadius={12}
+            icon="calendar-outline"
+            value={formatDate(profile.dateOfBirth)}
+            editable={false}
           />
         </View>
       </ScrollView>
@@ -96,34 +154,50 @@ const PersonalInformationScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  container: {
-    padding: 20,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  avatar: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginBottom: 15,
-  },
-  headerText: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  formContainer: {
-    flex: 1,
-  },
-  buttonContainer: {
-    marginTop: 20,
-  },
-});
+    safeArea: {
+      flex: 1,
+      backgroundColor: '#f4f6f9',
+    },
+    container: {
+      paddingVertical: 20,
+    },
+    center: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#f4f6f9',
+    },
+    avatarSection: {
+      alignItems: 'center',
+      marginBottom: 30,
+    },
+    avatar: {
+      width: 120,
+      height: 120,
+      borderRadius: 60,
+      backgroundColor: '#eee',
+    },
+    cameraIcon: {
+      position: 'absolute',
+      bottom: 0,
+      right: 0,
+      backgroundColor: '#00B14F',
+      padding: 8,
+      borderRadius: 15,
+      borderWidth: 2,
+      borderColor: '#fff'
+    },
+    formContainer: {
+      backgroundColor: '#fff',
+      marginHorizontal: 16,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: '#f0f0f0',
+      marginLeft: 56,
+    },
+  });
 
 export default PersonalInformationScreen;
