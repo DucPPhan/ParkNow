@@ -3,6 +3,7 @@ import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 // !!! QUAN TRỌNG: Đảm bảo đây là địa chỉ IP và cổng chính xác của backend
 const API_ENDPOINT = 'http://103.56.161.75/api';
+const USER_ENDPOINT = 'http://103.56.161.75/user';
 
 /**
  * ====================================================================
@@ -248,7 +249,7 @@ const api = {
             if (!token) {
                 return { success: false, message: 'Người dùng chưa đăng nhập.' };
             }   
-            const response = await fetch(`${API_ENDPOINT}/favorite-address?PageNo=${pageNo}&PageSize=${pageSize}`, {
+            const response = await fetch(`${USER_ENDPOINT}/favorite-address?PageNo=${pageNo}&PageSize=${pageSize}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -424,6 +425,298 @@ const api = {
             console.error('Get Parking Detail API error:', error);
             return { success: false, message: 'Không thể kết nối đến máy chủ.' };
         }
+    },
+
+    /**
+     * ====================================================================
+     * BOOKING API ENDPOINTS
+     * ====================================================================
+     */
+    bookingApi: {
+        /**
+         * Lấy danh sách slot trống theo bãi đỗ xe và thời gian
+         * @param parkingId ID của bãi đỗ xe
+         * @param startTime Thời gian bắt đầu (ISO string)
+         * @param desireHour Số giờ mong muốn đặt
+         */
+        getAvailableSlots: async (parkingId: number, startTime: string, desireHour: number) => {
+            try {
+                const response = await fetch(`${API_ENDPOINT}/customer-booking/get-available-slots?ParkingId=${parkingId}&StartTimeBooking=${encodeURIComponent(startTime)}&DesireHour=${desireHour}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const responseData = await logAndParseResponse(response);
+
+                if (response.ok && responseData.statusCode === 200) {
+                    return { success: true, data: responseData.data };
+                } else {
+                    return { success: false, message: responseData.message || 'Lấy danh sách slot trống thất bại.' };
+                }
+            } catch (error) {
+                console.error('Get Available Slots API error:', error);
+                return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+            }
+        },
+
+        /**
+         * Tính toán giá booking
+         * @param parkingId ID của bãi đỗ xe
+         * @param slotId ID của slot
+         * @param startTime Thời gian bắt đầu
+         * @param endTime Thời gian kết thúc
+         * @param vehicleTypeId ID loại xe
+         */
+        calculatePricing: async (parkingId: number, slotId: number, startTime: string, endTime: string, vehicleTypeId: number) => {
+            try {
+                const response = await fetch(`${API_ENDPOINT}/mobile/booking/calculate-pricing`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        parkingId,
+                        slotId,
+                        startTime,
+                        endTime,
+                        vehicleTypeId
+                    }),
+                });
+
+                const responseData = await logAndParseResponse(response);
+
+                if (response.ok && responseData.statusCode === 200) {
+                    return { success: true, data: responseData.data };
+                } else {
+                    return { success: false, message: responseData.message || 'Tính toán giá thất bại.' };
+                }
+            } catch (error) {
+                console.error('Calculate Pricing API error:', error);
+                return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+            }
+        },
+
+        /**
+         * Tạo booking mới (cho user đã đăng nhập)
+         */
+        createBooking: async (bookingData: {
+            parkingId: number;
+            slotId: number;
+            vehicleId: number;
+            startTime: string;
+            endTime: string;
+            paymentMethod: string;
+            notes?: string;
+        }) => {
+            try {
+                const token = await SecureStore.getItemAsync('userToken');
+                if (!token) {
+                    return { success: false, message: 'Bạn cần đăng nhập để đặt chỗ.' };
+                }
+
+                const response = await fetch(`${API_ENDPOINT}/mobile/booking`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(bookingData),
+                });
+
+                const responseData = await logAndParseResponse(response);
+
+                if (response.ok && (responseData.statusCode === 200 || responseData.statusCode === 201)) {
+                    return { success: true, data: responseData.data };
+                } else {
+                    return { success: false, message: responseData.message || 'Tạo booking thất bại.' };
+                }
+            } catch (error) {
+                console.error('Create Booking API error:', error);
+                return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+            }
+        },
+
+        /**
+         * Tạo booking cho khách (guest booking)
+         */
+        createGuestBooking: async (guestBookingData: {
+            parkingId: number;
+            slotId: number;
+            guestName: string;
+            guestPhone: string;
+            vehiclePlate: string;
+            vehicleTypeId: number;
+            startTime: string;
+            endTime: string;
+            paymentMethod: string;
+            notes?: string;
+        }) => {
+            try {
+                const response = await fetch(`${API_ENDPOINT}/mobile/booking/guest`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(guestBookingData),
+                });
+
+                const responseData = await logAndParseResponse(response);
+
+                if (response.ok && (responseData.statusCode === 200 || responseData.statusCode === 201)) {
+                    return { success: true, data: responseData.data };
+                } else {
+                    return { success: false, message: responseData.message || 'Tạo booking khách thất bại.' };
+                }
+            } catch (error) {
+                console.error('Create Guest Booking API error:', error);
+                return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+            }
+        },
+
+        /**
+         * Tạo prepaid booking
+         */
+        createPrepaidBooking: async (prepaidData: {
+            parkingId: number;
+            vehicleId: number;
+            duration: number; // minutes
+            amount: number;
+            paymentMethod: string;
+        }) => {
+            try {
+                const token = await SecureStore.getItemAsync('userToken');
+                if (!token) {
+                    return { success: false, message: 'Bạn cần đăng nhập để đặt chỗ.' };
+                }
+
+                const response = await fetch(`${API_ENDPOINT}/mobile/booking/prepaid`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(prepaidData),
+                });
+
+                const responseData = await logAndParseResponse(response);
+
+                if (response.ok && (responseData.statusCode === 200 || responseData.statusCode === 201)) {
+                    return { success: true, data: responseData.data };
+                } else {
+                    return { success: false, message: responseData.message || 'Tạo prepaid booking thất bại.' };
+                }
+            } catch (error) {
+                console.error('Create Prepaid Booking API error:', error);
+                return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+            }
+        },
+
+        /**
+         * Lấy lịch sử booking của user
+         * @param status Optional filter by status
+         * @param page Page number for pagination
+         * @param limit Items per page
+         */
+        getBookingHistory: async (status?: string, page: number = 1, limit: number = 10) => {
+            try {
+                const token = await SecureStore.getItemAsync('userToken');
+                if (!token) {
+                    return { success: false, message: 'Bạn cần đăng nhập để xem lịch sử.' };
+                }
+
+                let url = `${API_ENDPOINT}/mobile/booking/history?page=${page}&limit=${limit}`;
+                if (status) {
+                    url += `&status=${encodeURIComponent(status)}`;
+                }
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                const responseData = await logAndParseResponse(response);
+
+                if (response.ok && responseData.statusCode === 200) {
+                    return { success: true, data: responseData.data };
+                } else {
+                    return { success: false, message: responseData.message || 'Lấy lịch sử booking thất bại.' };
+                }
+            } catch (error) {
+                console.error('Get Booking History API error:', error);
+                return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+            }
+        },
+
+        /**
+         * Lấy chi tiết booking
+         * @param bookingId ID của booking
+         */
+        getBookingDetail: async (bookingId: number) => {
+            try {
+                const token = await SecureStore.getItemAsync('userToken');
+                if (!token) {
+                    return { success: false, message: 'Bạn cần đăng nhập để xem chi tiết.' };
+                }
+
+                const response = await fetch(`${API_ENDPOINT}/mobile/booking/${bookingId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                const responseData = await logAndParseResponse(response);
+
+                if (response.ok && responseData.statusCode === 200) {
+                    return { success: true, data: responseData.data };
+                } else {
+                    return { success: false, message: responseData.message || 'Lấy chi tiết booking thất bại.' };
+                }
+            } catch (error) {
+                console.error('Get Booking Detail API error:', error);
+                return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+            }
+        },
+
+        /**
+         * Hủy booking
+         * @param bookingId ID của booking cần hủy
+         * @param reason Lý do hủy (optional)
+         */
+        cancelBooking: async (bookingId: number, reason?: string) => {
+            try {
+                const token = await SecureStore.getItemAsync('userToken');
+                if (!token) {
+                    return { success: false, message: 'Bạn cần đăng nhập để hủy booking.' };
+                }
+
+                const response = await fetch(`${API_ENDPOINT}/mobile/booking/${bookingId}/cancel`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ reason }),
+                });
+
+                const responseData = await logAndParseResponse(response);
+
+                if (response.ok && (responseData.statusCode === 200 || response.status === 204)) {
+                    return { success: true, data: responseData.data };
+                } else {
+                    return { success: false, message: responseData.message || 'Hủy booking thất bại.' };
+                }
+            } catch (error) {
+                console.error('Cancel Booking API error:', error);
+                return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+            }
+        },
     },
 };
 

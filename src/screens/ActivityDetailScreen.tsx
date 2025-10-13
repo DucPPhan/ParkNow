@@ -1,13 +1,14 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { ActivityDetailScreenRouteProp } from '../navigation/types';
+import { ActivityDetailScreenRouteProp, BookingScreenNavigationProp } from '../navigation/types';
 
 import RatingStars from '../components/RatingStars';
 import InfoRow from '../components/InfoRow';
 import Button from '../components/Button';
+import api from '../services/api';
 
 // Component con để code gọn gàng
 const Section = ({ children, title }: { children: React.ReactNode; title?: string }) => (
@@ -19,9 +20,62 @@ const Section = ({ children, title }: { children: React.ReactNode; title?: strin
 
 const ActivityDetailScreen = () => {
   const route = useRoute<ActivityDetailScreenRouteProp>();
+  const navigation = useNavigation<BookingScreenNavigationProp>();
   const { activity } = route.params;
 
+  const [cancelling, setCancelling] = useState(false);
+
   const isCancelled = activity.status === 'Đã hủy';
+  const isUpcoming = activity.status === 'Đang diễn ra'; // or check if it's upcoming
+  const canCancel = isUpcoming && !isCancelled;
+
+  const handleCancelBooking = () => {
+    Alert.alert(
+      'Xác nhận hủy',
+      'Bạn có chắc chắn muốn hủy booking này không?',
+      [
+        { text: 'Không', style: 'cancel' },
+        {
+          text: 'Có, hủy',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setCancelling(true);
+              // Assuming activity.id is the booking ID
+              const result = await api.bookingApi.cancelBooking(parseInt(activity.id), 'Người dùng hủy');
+
+              if (result.success) {
+                Alert.alert('Thành công', 'Đã hủy booking thành công', [
+                  {
+                    text: 'OK',
+                    onPress: () => {
+                      navigation.goBack();
+                    }
+                  }
+                ]);
+              } else {
+                Alert.alert('Lỗi', result.message);
+              }
+            } catch (error) {
+              console.error('Error cancelling booking:', error);
+              Alert.alert('Lỗi', 'Không thể hủy booking');
+            } finally {
+              setCancelling(false);
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const handleRebook = () => {
+    // Navigate to booking screen with the same parking ID
+    // You might need to extract parkingId from the activity data
+    navigation.navigate('Booking', {
+      parkingId: activity.id, // This should be the actual parking ID
+      parkingName: activity.parkingName
+    });
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom']}>
@@ -102,8 +156,37 @@ const ActivityDetailScreen = () => {
 
         {/* === PHẦN 4: NÚT BẤM === */}
         <View style={[styles.container, styles.buttonContainer]}>
-          <Button title="Liên hệ" onPress={() => { }} type="secondary" style={{ flex: 1, marginRight: 10 }} />
-          <Button title="Đặt lại" onPress={() => { }} style={{ flex: 1 }} />
+          {canCancel ? (
+            <>
+              <Button 
+                title="Liên hệ" 
+                onPress={() => { }} 
+                type="secondary" 
+                style={{ flex: 1, marginRight: 10 }} 
+              />
+              <Button 
+                title="Hủy booking" 
+                onPress={handleCancelBooking}
+                loading={cancelling}
+                type="secondary"
+                style={{ flex: 1, marginRight: 10, backgroundColor: '#F44336' }} 
+              />
+            </>
+          ) : (
+            <>
+              <Button 
+                title="Liên hệ" 
+                onPress={() => { }} 
+                type="secondary" 
+                style={{ flex: 1, marginRight: 10 }} 
+              />
+              <Button 
+                title="Đặt lại" 
+                onPress={handleRebook} 
+                style={{ flex: 1 }} 
+              />
+            </>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

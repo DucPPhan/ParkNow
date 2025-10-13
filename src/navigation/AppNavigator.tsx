@@ -93,7 +93,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Wallet" component={WalletScreen} options={{ title: 'Ví ParkNow' }} />
         <Stack.Screen name="AddVehicle" component={AddVehicleScreen} options={{ title: 'Thêm phương tiện' }} />
         <Stack.Screen name="VehicleDetail" component={VehicleDetailScreen} options={{ title: 'Chi tiết phương tiện' }} />
-        <Stack.Screen name="Booking" component={BookingScreen} options={{ title: 'Đặt chỗ' }} />
+        <Stack.Screen name="Booking" component={BookingScreen} options={{ title: 'Đặt chỗ' , headerShown: false }} />
         <Stack.Screen name="Notification" component={NotificationScreen} options={{ title: 'Thông báo' }} />
       </Stack.Navigator>
     </NavigationContainer>

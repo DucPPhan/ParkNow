@@ -12,6 +12,32 @@ export type Vehicle = {
   isDefault: boolean;
 };
 
+export type BookingSlot = {
+  id: number;
+  slotNumber: string;
+  status: 'available' | 'occupied' | 'reserved';
+  vehicleType: string;
+  hourlyRate: number;
+};
+
+export type BookingDetails = {
+  id: number;
+  parkingId: number;
+  parkingName: string;
+  slotId: number;
+  slotNumber: string;
+  vehicleId?: number;
+  vehiclePlate: string;
+  startTime: string;
+  endTime: string;
+  status: 'upcoming' | 'active' | 'completed' | 'cancelled';
+  totalAmount: number;
+  paymentMethod: string;
+  bookingCode: string;
+  createdAt: string;
+  notes?: string;
+};
+
 export type MainTabParamList = {
   HomeTab: undefined;
   ActivityTab: undefined;
@@ -55,6 +81,7 @@ export type BookingScreenNavigationProp = StackNavigationProp<RootStackParamList
 // Kiểu cho route prop để lấy params
 export type ParkingDetailScreenRouteProp = RouteProp<RootStackParamList, 'ParkingDetail'>;
 export type ActivityDetailScreenRouteProp = RouteProp<RootStackParamList, 'ActivityDetail'>;
+export type BookingScreenRouteProp = RouteProp<RootStackParamList, 'Booking'>;
 export type RegistrationStackParamList = {
   Step1_Phone: undefined;
   Step2_Gmail: undefined;
