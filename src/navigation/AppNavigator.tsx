@@ -40,11 +40,11 @@ const AppNavigator = () => {
       >
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="RegistrationFlow" component={RegistrationNavigator} />
+        <Stack.Screen name="RegistrationFlow" component={RegistrationNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="CompleteProfile" component={CompleteProfileScreen} options={{ title: 'Hoàn thiện hồ sơ' }} />
         <Stack.Screen name="MainApp" component={MainTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="ParkingList" component={ParkingListScreen} options={({ route }) => ({ title: route.params.title })} />
-        <Stack.Screen name="ParkingDetail" component={ParkingDetailScreen} options={({ route }) => ({ title: route.params.name })} />
+        <Stack.Screen name="ParkingDetail" component={ParkingDetailScreen} options={({ route }) => ({ title: route.params.name, headerShown: false })} />
         <Stack.Screen name="ActivityDetail" component={ActivityDetailScreen} options={{ title: 'Chi tiết hoạt động' }} />
         <Stack.Screen
           name="PersonalInformation"

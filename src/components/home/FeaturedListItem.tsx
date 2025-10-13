@@ -9,10 +9,10 @@ type FeaturedListItemProps = {
     name: string;
     address: string;
     rating: number;
-    price: number;
+    priceCar: number;
+    priceMoto: number;
     isFavorite: boolean;
-    imageUrl: any;
-    distance?: number; // Thêm prop distance (tùy chọn)
+    imageUrl: string;
   };
   onPress: () => void;
 };
@@ -22,7 +22,7 @@ const FeaturedListItem = ({ item, onPress }: FeaturedListItemProps) => {
 
   return (
     <TouchableOpacity onPress={onPress} style={styles.container}>
-      <Image source={item.imageUrl} style={styles.image} />
+      <Image source={{ uri: item.imageUrl }} style={styles.image} />
       <View style={styles.infoContainer}>
         <View>
           <View style={styles.header}>
@@ -38,11 +38,17 @@ const FeaturedListItem = ({ item, onPress }: FeaturedListItemProps) => {
           <Text style={styles.address} numberOfLines={2}>{item.address}</Text>
         </View>
         <View style={styles.footer}>
-          <Text style={styles.rating}>⭐ {item.rating.toFixed(1)}</Text>
-          {item.distance && (
-            <Text style={styles.distance}>{item.distance.toFixed(1)} km</Text>
-          )}
-          <Text style={styles.price}>{item.price.toLocaleString('vi-VN')}đ</Text>
+          <Text style={styles.rating}>⭐ {(item.rating || 0).toFixed(1)}</Text>
+          <View style={styles.pricesSection}>
+            <View style={styles.priceContainer}>
+              <Text style={styles.priceLabel}>Ô tô: </Text>
+              <Text style={styles.price}>{(item.priceCar || 0).toLocaleString('vi-VN')}đ</Text>
+            </View>
+            <View style={styles.priceContainer}>
+              <Text style={styles.priceLabel}>Xe máy: </Text>
+              <Text style={styles.price}>{(item.priceMoto || 0).toLocaleString('vi-VN')}đ</Text>
+            </View>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -92,7 +98,20 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  pricesSection: {
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+  },
+  priceContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 2,
+  },
+  priceLabel: {
+    fontSize: 12,
+    color: '#666',
   },
   distance: {
     fontSize: 14,
@@ -104,7 +123,7 @@ const styles = StyleSheet.create({
     color: '#f39c12',
   },
   price: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#3498db',
   },

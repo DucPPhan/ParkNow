@@ -398,6 +398,33 @@ const api = {
             return { success: false, message: 'Không thể kết nối đến máy chủ.' };
         }
     },
+
+    /**
+     * Lấy thông tin chi tiết của bãi đỗ xe
+     * @param parkingId ID của bãi đỗ xe
+     * @return Thông tin chi tiết bãi đỗ xe
+     */
+    getParkingDetail: async (parkingId: number) => {
+        try {
+            const response = await fetch(`${API_ENDPOINT}/parkings/mobile/parking-details?ParkingId=${parkingId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const responseData = await logAndParseResponse(response);
+
+            if (response.ok && responseData.statusCode === 200 && responseData.data) {
+                return { success: true, data: responseData.data };
+            } else {
+                return { success: false, message: responseData.message || 'Lấy thông tin chi tiết bãi đỗ xe thất bại.' };
+            }
+        } catch (error) {
+            console.error('Get Parking Detail API error:', error);
+            return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+        }
+    },
 };
 
 export default api;

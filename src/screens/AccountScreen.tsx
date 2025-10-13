@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import ProfileMenuItem from '../components/ProfileMenuItem';
@@ -36,21 +37,23 @@ interface UserProfile {
 const AccountScreen = ({ navigation }: Props) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    const fetchProfile = async () => {
-      setLoading(true);
-      const result = await api.getUserProfile();
+  const fetchProfile = useCallback(async () => {
+    setLoading(true);
+    const result = await api.getUserProfile();
 
-      if (result.success) {
-        setProfile(result.data);
-      } else {
-        Alert.alert('Lỗi', result.message || 'Không thể tải thông tin người dùng.');
-      }
-      setLoading(false);
-    };
-
-    fetchProfile();
+    if (result.success) {
+      setProfile(result.data);
+    } else {
+      Alert.alert('Lỗi', result.message || 'Không thể tải thông tin người dùng.');
+    }
+    setLoading(false);
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfile();
+    }, [fetchProfile])
+  );
 
   if (loading) {
       return (

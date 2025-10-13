@@ -14,11 +14,11 @@ const NearbyCard = ({ item, onPress }: NearbyCardProps) => {
       <View style={styles.infoContainer}>
         <View style={styles.header}>
           <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
-          <Text style={styles.rating}>⭐ {item.rating.toFixed(1)}</Text>
+          <Text style={styles.rating}>⭐ {(item.rating || 0).toFixed(1)}</Text>
         </View>
         <Text style={styles.address} numberOfLines={1}>{item.address}</Text>
-        <Text style={styles.tags}>{item.tags.join(' | ')}</Text>
-        <Text style={styles.price}>{item.price.toLocaleString('vi-VN')}đ</Text>
+        <Text style={styles.tags}>{(item.tags || []).join(' | ')}</Text>
+        <Text style={styles.price}>{(item.price || 0).toLocaleString('vi-VN')}đ</Text>
       </View>
     </TouchableOpacity>
   );

@@ -24,18 +24,28 @@ import api from '../services/api';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
+interface ParkingApiResponse {
+  parkingShowInCusDto: {
+    parkingId: number;
+    name: string;
+    address: string;
+    avatar: string;
+    stars: number;
+  };
+  priceCar: number;
+  priceMoto: number;
+}
+
 interface ProcessedParking {
   id: string;
   name: string;
   address: string;
   rating: number;
-  price: number;
-  tags: string[];
+  priceCar: number;
+  priceMoto: number;
+  avatar: string;
   isFavorite: boolean;
-  imageUrl: any;
-  coordinate: { latitude: number; longitude: number };
-  distance?: number;
-  distanceBucket?: number;
+  imageUrl: string;
 }
 
 const HomeScreen = () => {
@@ -46,42 +56,26 @@ const HomeScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAndSortParkings = async () => {
+    const fetchFeaturedParkings = async () => {
       setIsLoading(true);
 
-      // 1. Lấy vị trí hiện tại của người dùng
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        console.error('Permission to access location was denied');
-        setIsLoading(false);
-        return;
-      }
-      const userLocation = await Location.getCurrentPositionAsync({});
-      const { latitude, longitude } = userLocation.coords;
-
-      // 2. Gọi API để lấy danh sách bãi xe nổi bật
+      // Gọi API để lấy danh sách bãi xe nổi bật
       const result = await api.getFeaturedParkings();
 
       if (result.success && result.data) {
-        // 3. Xử lý và sắp xếp dữ liệu
-        const processedList: ProcessedParking[] = result.data.map((parking: any) => {
-          const distance = getDistanceInKm(
-            latitude,
-            longitude,
-            parking.latitude,
-            parking.longtitude
-          );
-          // Chia các bãi xe vào các "nhóm khoảng cách" (1km, 2km, 3km...)
-          const distanceBucket = Math.ceil(distance);
-          return { ...parking, distance, distanceBucket };
-        });
-
-        // 4. Sắp xếp theo yêu cầu: ưu tiên nhóm khoảng cách, sau đó đến rating
-        processedList.sort((a, b) => {
-          if (a.distanceBucket !== b.distanceBucket) {
-            return (a.distanceBucket || 0) - (b.distanceBucket || 0); // Sắp xếp theo nhóm khoảng cách tăng dần
-          }
-          return b.rating - a.rating; // Sắp xếp theo rating giảm dần
+        // Xử lý dữ liệu từ API response
+        const processedList: ProcessedParking[] = result.data.map((parking: ParkingApiResponse) => {
+          return {
+            id: parking.parkingShowInCusDto.parkingId.toString(),
+            name: parking.parkingShowInCusDto.name,
+            address: parking.parkingShowInCusDto.address,
+            rating: parking.parkingShowInCusDto.stars,
+            priceCar: parking.priceCar,
+            priceMoto: parking.priceMoto,
+            avatar: parking.parkingShowInCusDto.avatar,
+            isFavorite: false, // Default value, có thể cập nhật từ API khác
+            imageUrl: parking.parkingShowInCusDto.avatar,
+          };
         });
 
         setFeaturedParkings(processedList);
@@ -91,7 +85,7 @@ const HomeScreen = () => {
       setIsLoading(false);
     };
 
-    fetchAndSortParkings();
+    fetchFeaturedParkings();
   }, []);
 
   return (

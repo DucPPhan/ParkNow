@@ -98,19 +98,21 @@ const MapScreen = () => {
           showsUserLocation // Hiển thị chấm xanh cho vị trí người dùng
         >
           {/* Đánh dấu các bãi xe */}
-          {parkings.map((parking) => (
+          {parkings
+            .filter((parking) => parking.parkingId && parking.latitude && parking.longtitude)
+            .map((parking, index) => (
             <Marker
-              key={parking.parkingId}
+              key={`parking-${parking.parkingId || index}`}
               coordinate={{
                 latitude: parking.latitude,
                 longitude: parking.longtitude,
               }}
-              title={parking.parkingName}
-              description={parking.address}
+              title={parking.parkingName || 'Bãi đỗ xe'}
+              description={parking.address || 'Không có địa chỉ'}
               onCalloutPress={() =>
                 navigation.navigate('ParkingDetail', {
-                  parkingId: parking.parkingId.toString(),
-                  name: parking.parkingName,
+                  parkingId: parking.parkingId?.toString() || index.toString(),
+                  name: parking.parkingName || 'Bãi đỗ xe',
                 })
               }
             >
