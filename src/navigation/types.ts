@@ -24,6 +24,7 @@ export type RootStackParamList = {
   Onboarding: undefined;
   Login: undefined;
   MainApp: NavigatorScreenParams<MainTabParamList>;
+  CompleteProfile: undefined;
   ParkingList: { title: string };
   ParkingDetail: { parkingId: string; name: string };
   ActivityDetail: { activity: Activity };
@@ -56,6 +57,7 @@ export type ParkingDetailScreenRouteProp = RouteProp<RootStackParamList, 'Parkin
 export type ActivityDetailScreenRouteProp = RouteProp<RootStackParamList, 'ActivityDetail'>;
 export type RegistrationStackParamList = {
   Step1_Phone: undefined;
-  Step2_PersonalInfo: undefined;
-  Step3_IDCard: undefined;
+  Step2_Gmail: undefined;
+  Step3_OTP: undefined;
+  Step4_Password: undefined;
 };

@@ -52,20 +52,21 @@ const api = {
      * Hàm xử lý đăng nhập người dùng
      * @param phoneNumber Số điện thoại
      */
-    login: async (phone: string) => {
+    login: async (phone: string, password: string) => {
         try {
             const response = await fetch(`${API_ENDPOINT}/mobile/customer-authentication/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ phone }),
+                // Backend expects phoneNumber sometimes; current client uses { phone, password }
+                body: JSON.stringify({ phone, password }),
             });
 
             // Sử dụng hàm trợ giúp để log và lấy dữ liệu
             const responseData = await logAndParseResponse(response);
 
-            if (response.ok && responseData.statusCode === 200 && responseData.data) {
+            if (response.ok && (responseData.statusCode === 200 || responseData.statusCode === 201) && responseData.data) {
                 await SecureStore.setItemAsync('userToken', responseData.data);
                 return { success: true, data: responseData.data };
             } else {
@@ -91,10 +92,77 @@ const api = {
         }
     },
     /**
+     * Kiểm tra số điện thoại đã tồn tại hay chưa
+     */
+    checkPhone: async (phoneNumber: string) => {
+        try {
+            const response = await fetch(`${API_ENDPOINT}/mobile/customer-authentication/check-phone`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phoneNumber }),
+            });
+            const responseData = await logAndParseResponse(response);
+            if (response.ok && responseData.statusCode === 200) {
+                return { success: true, data: responseData.data };
+            }
+            return { success: false, message: responseData.message || 'Kiểm tra số điện thoại thất bại.' };
+        } catch (error) {
+            console.error('Check phone API error:', error);
+            return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+        }
+    },
+    /**
+     * Gửi OTP đến email
+     */
+    sendEmailOtp: async (email: string, phoneNumber: string) => {
+        try {
+            const response = await fetch(`${API_ENDPOINT}/mobile/customer-authentication/send-email-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, phoneNumber }),
+            });
+            const responseData = await logAndParseResponse(response);
+            if (
+                response.ok && (
+                    response.status === 204 ||
+                    responseData.statusCode === 200 ||
+                    responseData.statusCode === 201
+                )
+            ) {
+                return { success: true };
+            }
+            return { success: false, message: responseData.message || 'Gửi OTP thất bại.' };
+        } catch (error) {
+            console.error('Send email OTP error:', error);
+            return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+        }
+    },
+    /**
+     * Xác minh OTP email, trả về token
+     */
+    verifyEmailOtp: async (email: string, otp: string) => {
+        try {
+            const response = await fetch(`${API_ENDPOINT}/mobile/customer-authentication/verify-email-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, otp }),
+            });
+            const responseData = await logAndParseResponse(response);
+            if (response.ok && responseData.statusCode === 200 && responseData.data) {
+                return { success: true, data: responseData.data };
+            }
+            return { success: false, message: responseData.message || 'Xác minh OTP thất bại.' };
+        } catch (error) {
+            console.error('Verify email OTP error:', error);
+            return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+        }
+    },
+    /**
    * Hàm xử lý đăng ký tài khoản mới
    * @param data Dữ liệu đăng ký từ các bước
    */
-    register: async (data: any) => {
+    register: async (data: { phoneNumber: string; email: string; password: string; token: string; }) => {
+        console.log('Registering with data:', data); // Log dữ liệu đăng ký
         try {
             const response = await fetch(`${API_ENDPOINT}/mobile/customer-authentication/register`, {
                 method: 'POST',
@@ -104,13 +172,12 @@ const api = {
                 body: JSON.stringify(data),
             });
 
-            const responseData = await response.json(); // Luôn parse để xem message
+            const responseData = await logAndParseResponse(response); // parse + log
 
-            if (response.ok && responseData.statusCode === 201) { // Thường mã 201 cho Created
-                return { success: true };
-            } else {
-                return { success: false, message: responseData.message || 'Đăng ký thất bại.' };
+            if (response.ok && (responseData.statusCode === 200 || responseData.statusCode === 201)) {
+                return { success: true, data: responseData.data };
             }
+            return { success: false, message: responseData.message || 'Đăng ký thất bại.' };
         } catch (error) {
             console.error('Register API error:', error);
             return { success: false, message: 'Không thể kết nối đến máy chủ.' };

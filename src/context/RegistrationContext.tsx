@@ -2,14 +2,10 @@ import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 // Định nghĩa cấu trúc dữ liệu đăng ký
 interface RegistrationData {
-  phone?: string;
-  name?: string;
-  dateOfBirth?: Date;
-  gender?: string;
-  idCardNo?: string;
-  idCardDate?: Date;
-  idCardIssuedBy?: string;
-  address?: string;
+  phoneNumber: string;
+  email: string;
+  password: string;
+  token: string; // token nhận được sau verify email OTP
 }
 
 // Định nghĩa kiểu cho Context
@@ -24,14 +20,24 @@ const RegistrationContext = createContext<RegistrationContextType | undefined>(u
 
 // Tạo Provider
 export const RegistrationProvider = ({ children }: { children: ReactNode }) => {
-  const [data, setData] = useState<RegistrationData>({});
+  const [data, setData] = useState<RegistrationData>({
+    phoneNumber: '',
+    email: '',
+    password: '',
+    token: '',
+  });
 
   const updateRegistrationData = (newData: Partial<RegistrationData>) => {
     setData(prevData => ({ ...prevData, ...newData }));
   };
 
   const resetRegistrationData = () => {
-    setData({});
+    setData({
+      phoneNumber: '',
+      email: '',
+      password: '',
+      token: '',
+    });
   };
 
   return (

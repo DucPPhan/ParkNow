@@ -28,6 +28,7 @@ const GRAB_GREEN = '#00B14F';
 
 const LoginScreen = ({ navigation }: Props) => {
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false); // Thêm state cho trạng thái loading
 
   const handleLogin = async () => {
@@ -37,6 +38,10 @@ const LoginScreen = ({ navigation }: Props) => {
       Alert.alert("Lỗi", "Số điện thoại không hợp lệ. Vui lòng kiểm tra lại.");
       return;
     }
+    if (!password || password.length < 6) {
+      Alert.alert("Lỗi", "Vui lòng nhập mật khẩu (tối thiểu 6 ký tự).");
+      return;
+    }
     // else {
     //   navigation.replace('MainApp', { screen: 'HomeTab' });
     // }
@@ -44,7 +49,7 @@ const LoginScreen = ({ navigation }: Props) => {
     setLoading(true); // Bắt đầu loading
 
     // Gọi hàm login từ service API
-    const result = await api.login(phoneNumber);
+  const result = await api.login(phoneNumber, password);
 
     setLoading(false); // Dừng loading
 
@@ -87,6 +92,18 @@ const LoginScreen = ({ navigation }: Props) => {
             />
           </View>
 
+          <View style={styles.passwordInputContainer}>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Mật khẩu"
+              placeholderTextColor="#8A8A8E"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              editable={!loading}
+            />
+          </View>
+
           <TouchableOpacity
             style={[styles.continueButton, loading && styles.disabledButton]}
             onPress={handleLogin}
@@ -95,7 +112,7 @@ const LoginScreen = ({ navigation }: Props) => {
             {loading ? (
               <ActivityIndicator color="#FFFFFF" />
             ) : (
-              <Text style={styles.continueButtonText}>Tiếp tục</Text>
+              <Text style={styles.continueButtonText}>Đăng nhập</Text>
             )}
           </TouchableOpacity>
 
@@ -165,6 +182,16 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  passwordInputContainer: {
+    width: '100%',
+    height: 56,
+    backgroundColor: '#F2F2F7',
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    paddingHorizontal: 12,
   },
   countryCodeContainer: {
     flexDirection: 'row',

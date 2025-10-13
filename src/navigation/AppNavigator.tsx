@@ -23,6 +23,7 @@ import FavoriteAddressesScreen from '../screens/FavoriteAddressesScreen.tsx';
 import HelpScreen from '../screens/HelpScreen.tsx';
 import SettingsScreen from '../screens/SettingsScreen.tsx';
 import AboutUsScreen from '../screens/AboutUsScreen.tsx';
+import CompleteProfileScreen from '../screens/CompleteProfileScreen';
 
 const Stack = createStackNavigator<RootStackParamList>(); // Sử dụng kiểu ở đây
 
@@ -40,6 +41,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="RegistrationFlow" component={RegistrationNavigator} />
+        <Stack.Screen name="CompleteProfile" component={CompleteProfileScreen} options={{ title: 'Hoàn thiện hồ sơ' }} />
         <Stack.Screen name="MainApp" component={MainTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="ParkingList" component={ParkingListScreen} options={({ route }) => ({ title: route.params.title })} />
         <Stack.Screen name="ParkingDetail" component={ParkingDetailScreen} options={({ route }) => ({ title: route.params.name })} />
