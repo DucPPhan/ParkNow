@@ -419,6 +419,53 @@ const api = {
     },
 
     /**
+     * Thay đổi mật khẩu người dùng
+     * @param userId ID người dùng
+     * @param currentPassword Mật khẩu hiện tại
+     * @param newPassword Mật khẩu mới
+     * @param confirmPassword Xác nhận mật khẩu mới
+     * @return Kết quả của thao tác thay đổi mật khẩu
+     */
+    changePassword: async (userId: number, currentPassword: string, newPassword: string, confirmPassword: string) => {
+        try {
+            const token = await SecureStore.getItemAsync('userToken');
+            if (!token) {
+                return { success: false, message: 'Người dùng chưa đăng nhập.' };
+            }
+            const response = await fetch(`${API_ENDPOINT}/mobile/account/change-password`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    userId,
+                    currentPassword,
+                    newPassword,
+                    confirmPassword,
+                }),
+            });
+
+            // Nếu là 204 No Content thì coi như thành công
+            if (response.status === 204) {
+                await logAndParseResponse(response);
+                return { success: true };
+            }
+
+            const responseData = await logAndParseResponse(response);
+
+            if (response.ok && (responseData.statusCode === 200 || responseData.statusCode === 201)) {
+                return { success: true };
+            } else {
+                return { success: false, message: responseData.message || 'Thay đổi mật khẩu thất bại.' };
+            }
+        } catch (error) {
+            console.error('Change Password API error:', error);
+            return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+        }
+    },
+
+    /**
      * Lấy thông tin chi tiết của bãi đỗ xe
      * @param parkingId ID của bãi đỗ xe
      * @return Thông tin chi tiết bãi đỗ xe

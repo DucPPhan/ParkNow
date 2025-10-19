@@ -75,6 +75,7 @@ export type RootStackParamList = {
   Help: undefined;
   Settings: undefined;
   AboutUs: undefined;
+  ChangePassword: undefined;
 };
 
 // Kiểu cho navigation prop ở các màn hình khác nhau
