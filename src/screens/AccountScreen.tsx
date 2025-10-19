@@ -16,6 +16,7 @@ import { RootStackParamList } from '../navigation/types';
 import { Ionicons } from '@expo/vector-icons';
 import ProfileMenuItem from '../components/ProfileMenuItem';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 type AccountScreenNavigationProp = StackNavigationProp<RootStackParamList, 'MainApp'>;
 
@@ -37,6 +38,8 @@ interface UserProfile {
 const AccountScreen = ({ navigation }: Props) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const { signOut } = useAuth();
+  
   const fetchProfile = useCallback(async () => {
     setLoading(true);
     const result = await api.getUserProfile();
@@ -82,6 +85,7 @@ const AccountScreen = ({ navigation }: Props) => {
           text: "Đồng ý",
           onPress: async () => {
             await api.logout();
+            await signOut();
             navigation.reset({
               index: 0,
               routes: [{ name: 'Login' }],

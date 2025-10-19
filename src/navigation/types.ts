@@ -10,6 +10,7 @@ export type Vehicle = {
   plate: string;
   type: 'car' | 'motorcycle';
   isDefault: boolean;
+  color?: string;
 };
 
 export type BookingSlot = {
@@ -18,6 +19,11 @@ export type BookingSlot = {
   status: 'available' | 'occupied' | 'reserved';
   vehicleType: string;
   hourlyRate: number;
+  rowIndex?: number;
+  columnIndex?: number;
+  isAvailable?: boolean;
+  floorId?: number;
+  trafficId?: number;
 };
 
 export type BookingDetails = {

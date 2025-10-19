@@ -3,6 +3,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList } from './types'; // Import từ file types
+import { View, ActivityIndicator, StyleSheet, TouchableOpacity, Text } from 'react-native';
 
 import LoginScreen from '../screens/LoginScreen';
 import MainTabNavigator from './MainTabNavigator.tsx';
@@ -18,27 +19,49 @@ import BookingScreen from '../screens/BookingScreen';
 import OnboardingScreen from '../screens/OnboardingScreen.tsx';
 import RegistrationNavigator from './RegistrationNavigator.tsx';
 import NotificationScreen from '../screens/NotificationScreen.tsx';
-import { TouchableOpacity, Text } from 'react-native';
 import FavoriteAddressesScreen from '../screens/FavoriteAddressesScreen.tsx';
 import HelpScreen from '../screens/HelpScreen.tsx';
 import SettingsScreen from '../screens/SettingsScreen.tsx';
 import AboutUsScreen from '../screens/AboutUsScreen.tsx';
 import CompleteProfileScreen from '../screens/CompleteProfileScreen';
+import { useAuth } from '../context/AuthContext';
 
 const Stack = createStackNavigator<RootStackParamList>(); // Sử dụng kiểu ở đây
 
 const AppNavigator = () => {
+  const { isLoading, userToken, hasSeenOnboarding } = useAuth();
+
+  // Hiển thị loading screen khi đang kiểm tra trạng thái
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#00B14F" />
+      </View>
+    );
+  }
+
+  // Xác định màn hình khởi đầu dựa trên trạng thái
+  const getInitialRouteName = (): keyof RootStackParamList => {
+    if (!hasSeenOnboarding) {
+      return 'Onboarding';
+    }
+    if (userToken) {
+      return 'MainApp';
+    }
+    return 'Login';
+  };
+
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Login"
+        initialRouteName={getInitialRouteName()}
         // Cấu hình chung cho header nếu cần
         screenOptions={{
           headerTitleStyle: { fontWeight: 'bold' },
           headerBackTitle: 'Trở về',
         }}
       >
-        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+        <Stack.Screen name="Onboarding" component={OnboardingScreen} options={{headerShown: false}}/>
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="RegistrationFlow" component={RegistrationNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="CompleteProfile" component={CompleteProfileScreen} options={{ title: 'Hoàn thiện hồ sơ' }} />
@@ -99,5 +122,14 @@ const AppNavigator = () => {
     </NavigationContainer>
   );
 };
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+});
 
 export default AppNavigator;

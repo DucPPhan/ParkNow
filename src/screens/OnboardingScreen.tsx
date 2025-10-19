@@ -6,6 +6,7 @@ import Button from '../components/Button';
 import slides from '../data/slides';
 import OnboardingSlide from '../components/OnboardingSlide';
 import Paginator from '../components/Paginator';
+import { useAuth } from '../context/AuthContext';
 
 type OnboardingScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -21,6 +22,7 @@ const OnboardingScreen = ({navigation}: Props) => {
   const scrollX = useRef(new Animated.Value(0)).current;
   const slidesRef = useRef<FlatList>(null);
   const {width} = useWindowDimensions();
+  const { completeOnboarding } = useAuth();
 
   const viewableItemsChanged = useRef(({viewableItems}: any) => {
     setCurrentIndex(viewableItems[0].index);
@@ -28,16 +30,20 @@ const OnboardingScreen = ({navigation}: Props) => {
 
   const viewConfig = useRef({viewAreaCoveragePercentThreshold: 50}).current;
 
-  const scrollTo = () => {
+  const scrollTo = async () => {
     if (currentIndex < slides.length - 1) {
       slidesRef.current?.scrollToIndex({index: currentIndex + 1});
     } else {
-      navigation.replace('Login'); // Navigate to Login or Main App
+      // Đánh dấu đã xem onboarding và chuyển đến màn hình Login
+      await completeOnboarding();
+      navigation.replace('Login');
     }
   };
 
-  const skip = () => {
-    navigation.replace('Login'); // Navigate to Login or Main App
+  const skip = async () => {
+    // Đánh dấu đã xem onboarding và chuyển đến màn hình Login
+    await completeOnboarding();
+    navigation.replace('Login');
   };
 
 

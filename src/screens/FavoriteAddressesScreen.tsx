@@ -19,7 +19,7 @@ const FavoriteAddressesScreen = () => {
   const fetchAddresses = useCallback(async () => {
     setLoading(true);
     const result = await api.getFavoriteAddresses();
-    if (result.success && Array.isArray(result.data)) {
+    if (result.success) {
       setAddresses(result.data);
     } else {
       Alert.alert('Lỗi', result.message || 'Không thể tải danh sách địa chỉ.');

@@ -3,7 +3,14 @@ import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 // !!! QUAN TRỌNG: Đảm bảo đây là địa chỉ IP và cổng chính xác của backend
 const API_ENDPOINT = 'http://103.56.161.75/api';
-const USER_ENDPOINT = 'http://103.56.161.75/user';
+const USER_ENDPOINT = 'http://103.56.161.75:5000/user';
+
+// Callback để xử lý khi token hết hạn
+let onTokenExpired: (() => void) | null = null;
+
+export const setTokenExpiredCallback = (callback: () => void) => {
+    onTokenExpired = callback;
+};
 
 /**
  * ====================================================================
@@ -13,6 +20,17 @@ const USER_ENDPOINT = 'http://103.56.161.75/user';
  * @returns Dữ liệu JSON đã được phân tích
  */
 const logAndParseResponse = async (response: Response) => {
+    // Kiểm tra xem response có phải là 401 Unauthorized không
+    if (response.status === 401) {
+        console.log('🔒 Token hết hạn hoặc không hợp lệ. Đăng xuất người dùng...');
+        // Xóa token
+        await SecureStore.deleteItemAsync('userToken');
+        // Gọi callback nếu có
+        if (onTokenExpired) {
+            onTokenExpired();
+        }
+    }
+
     // Sao chép response để có thể đọc body 2 lần (1 cho log, 1 cho logic)
     const clonedResponse = response.clone();
 
@@ -258,7 +276,7 @@ const api = {
             });
             const responseData = await logAndParseResponse(response);
 
-            if (response.ok && responseData.statusCode === 200 && responseData.data) {
+            if (response.ok && responseData.statusCode === 200) {
                 return { success: true, data: responseData.data };
             } else {
                 return { success: false, message: responseData.message || 'Lấy danh sách địa chỉ yêu thích thất bại.' };
@@ -429,6 +447,115 @@ const api = {
 
     /**
      * ====================================================================
+     * VEHICLE API ENDPOINTS
+     * ====================================================================
+     */
+    vehicleApi: {
+        /**
+         * Thêm phương tiện mới cho customer
+         * @param vehicleData Thông tin phương tiện cần thêm
+         */
+        addVehicle: async (vehicleData: {
+            licensePlate: string;
+            vehicleName: string;
+            color: string;
+            userId: number;
+            trafficId: number;
+        }) => {
+            try {
+                const token = await SecureStore.getItemAsync('userToken');
+                if (!token) {
+                    return { success: false, message: 'Bạn cần đăng nhập để thêm phương tiện.' };
+                }
+
+                const response = await fetch(`${API_ENDPOINT}/vehicle-infor`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(vehicleData),
+                });
+
+                const responseData = await logAndParseResponse(response);
+
+                if (response.ok && (responseData.statusCode === 200 || responseData.statusCode === 201)) {
+                    return { success: true, data: responseData.data };
+                } else {
+                    return { success: false, message: responseData.message || 'Thêm phương tiện thất bại.' };
+                }
+            } catch (error) {
+                console.error('Add Vehicle API error:', error);
+                return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+            }
+        },
+
+        /**
+         * Lấy danh sách phương tiện của user
+         */
+        getUserVehicles: async (pageNo: number = 1, pageSize: number = 10) => {
+            try {
+                const token = await SecureStore.getItemAsync('userToken');
+                if (!token) {
+                    return { success: false, message: 'Bạn cần đăng nhập để xem phương tiện.' };
+                }
+
+                const response = await fetch(`${USER_ENDPOINT}/vehicle-infor?pageNo=${pageNo}&pageSize=${pageSize}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                const responseData = await logAndParseResponse(response);
+
+                if (response.ok && responseData.statusCode === 200) {
+                    return { success: true, data: responseData.data };
+                } else {
+                    return { success: false, message: responseData.message || 'Lấy danh sách phương tiện thất bại.' };
+                }
+            } catch (error) {
+                console.error('Get User Vehicles API error:', error);
+                return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+            }
+        },
+
+        /**
+         * Xóa phương tiện
+         * @param vehicleId ID của phương tiện cần xóa
+         */
+        deleteVehicle: async (vehicleId: number) => {
+            try {
+                const token = await SecureStore.getItemAsync('userToken');
+                if (!token) {
+                    return { success: false, message: 'Bạn cần đăng nhập để xóa phương tiện.' };
+                }
+
+                const response = await fetch(`${API_ENDPOINT}/vehicle-infor/${vehicleId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                const responseData = await logAndParseResponse(response);
+
+                if (response.ok && (response.status === 200 || response.status === 204)) {
+                    return { success: true };
+                } else {
+                    return { success: false, message: responseData.message || 'Xóa phương tiện thất bại.' };
+                }
+            } catch (error) {
+                console.error('Delete Vehicle API error:', error);
+                return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+            }
+        },
+    },
+
+    /**
+     * ====================================================================
      * BOOKING API ENDPOINTS
      * ====================================================================
      */
@@ -464,25 +591,17 @@ const api = {
         /**
          * Tính toán giá booking
          * @param parkingId ID của bãi đỗ xe
-         * @param slotId ID của slot
-         * @param startTime Thời gian bắt đầu
-         * @param endTime Thời gian kết thúc
-         * @param vehicleTypeId ID loại xe
+         * @param startTimeBooking Thời gian bắt đầu (DateTime format)
+         * @param desiredHour Số giờ mong muốn đặt
+         * @param trafficId ID loại phương tiện (1: xe máy, 2: ô tô)
          */
-        calculatePricing: async (parkingId: number, slotId: number, startTime: string, endTime: string, vehicleTypeId: number) => {
+        calculatePricing: async (parkingId: number, startTimeBooking: string, desiredHour: number, trafficId: number) => {
             try {
-                const response = await fetch(`${API_ENDPOINT}/mobile/booking/calculate-pricing`, {
-                    method: 'POST',
+                const response = await fetch(`${API_ENDPOINT}/customer-booking/get-expected-price?ParkingId=${parkingId}&StartimeBooking=${encodeURIComponent(startTimeBooking)}&DesiredHour=${desiredHour}&TrafficId=${trafficId}`, {
+                    method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        parkingId,
-                        slotId,
-                        startTime,
-                        endTime,
-                        vehicleTypeId
-                    }),
                 });
 
                 const responseData = await logAndParseResponse(response);
@@ -502,27 +621,46 @@ const api = {
          * Tạo booking mới (cho user đã đăng nhập)
          */
         createBooking: async (bookingData: {
-            parkingId: number;
-            slotId: number;
-            vehicleId: number;
+            parkingSlotId: number;
             startTime: string;
             endTime: string;
+            dateBook: string;
+            guestName: string;
+            guestPhone: string;
             paymentMethod: string;
-            notes?: string;
-        }) => {
+            vehicleInforId: number;
+            userId: number;
+        }, deviceTokenMobile: string = '') => {
             try {
                 const token = await SecureStore.getItemAsync('userToken');
                 if (!token) {
                     return { success: false, message: 'Bạn cần đăng nhập để đặt chỗ.' };
                 }
 
-                const response = await fetch(`${API_ENDPOINT}/mobile/booking`, {
+                const requestBody = {
+                    bookingDto: {
+                        parkingSlotId: bookingData.parkingSlotId,
+                        startTime: bookingData.startTime,
+                        endTime: bookingData.endTime,
+                        dateBook: bookingData.dateBook,
+                        guestName: bookingData.guestName || '',
+                        guestPhone: bookingData.guestPhone || '',
+                        paymentMethod: bookingData.paymentMethod,
+                        vehicleInforId: bookingData.vehicleInforId,
+                        userId: bookingData.userId,
+                    },
+                    deviceTokenMobile: token || deviceTokenMobile,
+                };
+
+                console.log('Create Booking Request Body:', requestBody);
+
+                const response = await fetch(`${API_ENDPOINT}/customer-booking`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`,
                     },
-                    body: JSON.stringify(bookingData),
+                    body: JSON.stringify(requestBody),
                 });
 
                 const responseData = await logAndParseResponse(response);

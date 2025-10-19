@@ -1,5 +1,5 @@
 // src/screens/AddVehicleScreen.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import FormInput from '../components/FormInput';
 import Button from '../components/Button';
+import api from '../services/api';
 
 type VehicleType = 'car' | 'motorcycle';
 
@@ -21,16 +23,61 @@ const AddVehicleScreen = () => {
   const [vehicleType, setVehicleType] = useState<VehicleType>('motorcycle');
   const [name, setName] = useState('');
   const [plate, setPlate] = useState('');
+  const [color, setColor] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
 
-  const handleAddVehicle = () => {
-    if (!name || !plate) {
+  useEffect(() => {
+    loadUserProfile();
+  }, []);
+
+  const loadUserProfile = async () => {
+    try {
+      const result = await api.getUserProfile();
+      if (result.success && result.data) {
+        setUserId(result.data.userId);
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+    }
+  };
+
+  const handleAddVehicle = async () => {
+    if (!name || !plate || !color) {
       Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin.');
       return;
     }
-    // Logic thêm xe vào danh sách (trong ứng dụng thật)
-    Alert.alert('Thành công', 'Đã thêm phương tiện mới!', [
-      { text: 'OK', onPress: () => navigation.goBack() }
-    ]);
+
+    if (!userId) {
+      Alert.alert('Lỗi', 'Không thể xác định thông tin người dùng.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const result = await api.vehicleApi.addVehicle({
+        licensePlate: plate.toUpperCase(),
+        vehicleName: name,
+        color: color,
+        userId: userId,
+        trafficId: vehicleType === 'motorcycle' ? 1 : 2, // 1: Xe máy, 2: Ô tô
+      });
+
+      setLoading(false);
+
+      if (result.success) {
+        Alert.alert('Thành công', 'Đã thêm phương tiện mới!', [
+          { text: 'OK', onPress: () => navigation.goBack() }
+        ]);
+      } else {
+        Alert.alert('Lỗi', result.message || 'Không thể thêm phương tiện.');
+      }
+    } catch (error) {
+      setLoading(false);
+      Alert.alert('Lỗi', 'Đã có lỗi xảy ra. Vui lòng thử lại.');
+      console.error('Add vehicle error:', error);
+    }
   };
 
   return (
@@ -69,14 +116,20 @@ const AddVehicleScreen = () => {
           placeholder="Ví dụ: 72D1-12345"
           autoCapitalize="characters"
         />
+        <FormInput
+          label="Màu sắc"
+          icon="color-palette"
+          value={color}
+          onChangeText={setColor}
+          placeholder="Ví dụ: Đỏ, Xanh, Đen..."
+        />
         
         <View style={styles.buttonContainer}>
           <Button
             title="Thêm phương tiện"
             onPress={handleAddVehicle}
-            // backgroundColor="#3498db"
-            // textColor="#ffffff"
-            // minWidth={'100%'}
+            loading={loading}
+            disabled={loading}
           />
         </View>
       </ScrollView>

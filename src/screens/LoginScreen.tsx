@@ -17,6 +17,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/types';
 import SocialButton from '../components/SocialButton';
 import api from '../services/api'; // Import service mới
+import { useAuth } from '../context/AuthContext';
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -30,6 +31,7 @@ const LoginScreen = ({ navigation }: Props) => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false); // Thêm state cho trạng thái loading
+  const { signIn } = useAuth();
 
   const handleLogin = async () => {
     // Kiểm tra định dạng số điện thoại
@@ -42,18 +44,17 @@ const LoginScreen = ({ navigation }: Props) => {
       Alert.alert("Lỗi", "Vui lòng nhập mật khẩu (tối thiểu 6 ký tự).");
       return;
     }
-    // else {
-    //   navigation.replace('MainApp', { screen: 'HomeTab' });
-    // }
 
     setLoading(true); // Bắt đầu loading
 
     // Gọi hàm login từ service API
-  const result = await api.login(phoneNumber, password);
+    const result = await api.login(phoneNumber, password);
 
     setLoading(false); // Dừng loading
 
     if (result.success) {
+      // Lưu token vào context
+      await signIn(result.data);
       // Đăng nhập thành công, chuyển đến màn hình chính
       navigation.replace('MainApp', { screen: 'HomeTab' });
     } else {

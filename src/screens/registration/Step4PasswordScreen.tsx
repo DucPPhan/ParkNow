@@ -7,12 +7,14 @@ import Button from '../../components/Button';
 import { useRegistration } from '../../context/RegistrationContext';
 import api from '../../services/api';
 import { StackActions, useNavigation } from '@react-navigation/native';
+import { useAuth } from '../../context/AuthContext';
 
 type RegNav = StackNavigationProp<RegistrationStackParamList, 'Step4_Password'>;
 
 const Step4PasswordScreen = ({ navigation }: { navigation: RegNav }) => {
   const { data } = useRegistration();
   const rootNav = useNavigation<any>();
+  const { signIn } = useAuth();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -43,13 +45,15 @@ const Step4PasswordScreen = ({ navigation }: { navigation: RegNav }) => {
       return;
     }
     // Tự đăng nhập (nếu backend yêu cầu, có thể đã auto login). Ở đây gọi login qua số điện thoại.
-    const loginRes = await api.login(data.phoneNumber, data.password);
+    const loginRes = await api.login(data.phoneNumber, password);
     setLoading(false);
     if (!loginRes.success) {
       Alert.alert('Đăng nhập tự động thất bại', loginRes.message || 'Vui lòng đăng nhập thủ công.');
       rootNav.reset({ index: 0, routes: [{ name: 'Login' }] });
       return;
     }
+    // Lưu token vào context
+    await signIn(loginRes.data);
     // Điều hướng đến màn hình hoàn thiện hồ sơ để cập nhật name, avatar, dateOfBirth, gender
     rootNav.reset({ index: 0, routes: [{ name: 'CompleteProfile' }] });
   };
