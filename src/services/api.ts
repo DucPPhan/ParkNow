@@ -232,11 +232,12 @@ const api = {
      * Lấy danh sách bãi xe gần vị trí người dùng
      * @param latitude Vĩ độ của người dùng
      * @param longitude Kinh độ của người dùng
+     * @param distance Khoảng cách tối đa (km)
      */
-    getNearbyParkings: async (latitude: number, longitude: number) => {
+    getNearbyParkings: async (latitude: number, longitude: number, distance: number = 10) => {
         try {
             const token = await SecureStore.getItemAsync('userToken');
-            const response = await fetch(`${API_ENDPOINT}/parking-nearest?currentLatitude=${latitude}&currentLongtitude=${longitude}`, {
+            const response = await fetch(`${API_ENDPOINT}/parking-nearest/distance?currentLatitude=${latitude}&currentLongtitude=${longitude}&distance=${distance}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

@@ -23,18 +23,23 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginHorizontal: 16,
-    marginBottom: 15,
-    marginTop: 25,
+    marginBottom: 16,
+    marginTop: 28,
   },
   title: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#2c3e50',
+    letterSpacing: -0.5,
   },
   seeAll: {
-    fontSize: 15,
+    fontSize: 14,
     color: '#3498db',
     fontWeight: '600',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: '#e3f2fd',
+    borderRadius: 12,
   },
 });
 
