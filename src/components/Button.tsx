@@ -4,7 +4,7 @@ import { TouchableOpacity, Text, StyleSheet, StyleProp, ViewStyle, ActivityIndic
 interface ButtonProps {
   title: string;
   onPress: () => void;
-  type?: 'primary' | 'secondary';
+  type?: 'primary' | 'secondary' | 'cancel';
   style?: StyleProp<ViewStyle>;
   disabled?: boolean; // THÊM PROP NÀY
   loading?: boolean; // Thêm prop loading để hiển thị ActivityIndicator
@@ -19,18 +19,19 @@ const Button = ({
   loading = false,  // Thêm prop loading
 }: ButtonProps) => {
   const isPrimary = type === 'primary';
+  const isCancel = type === 'cancel';
 
   // Thêm style cho trạng thái disabled
   const buttonStyle = [
     styles.button,
-    isPrimary ? styles.primaryButton : styles.secondaryButton,
-    (disabled || loading) && (isPrimary ? styles.primaryDisabled : styles.secondaryDisabled), // Áp dụng style disabled
+    isCancel ? styles.cancelButton : isPrimary ? styles.primaryButton : styles.secondaryButton,
+    (disabled || loading) && (isCancel ? styles.cancelDisabled : isPrimary ? styles.primaryDisabled : styles.secondaryDisabled), // Áp dụng style disabled
     style,
   ];
 
   const textStyle = [
     styles.text,
-    isPrimary ? styles.primaryText : styles.secondaryText,
+    isCancel ? styles.cancelText : isPrimary ? styles.primaryText : styles.secondaryText,
     (disabled || loading) && styles.disabledText, // Áp dụng style text disabled
   ];
 
@@ -41,7 +42,7 @@ const Button = ({
       disabled={disabled || loading} // Vô hiệu hóa TouchableOpacity
     >
       {loading ? (
-        <ActivityIndicator color={isPrimary ? '#FFFFFF' : '#a9a9a9'} />
+        <ActivityIndicator color={isCancel || isPrimary ? '#FFFFFF' : '#a9a9a9'} />
       ) : (
         <Text style={textStyle}>{title}</Text>
       )}
@@ -62,6 +63,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#00B14F', // Màu xanh lá cây
     borderColor: '#00B14F',
   },
+  cancelButton: {
+    backgroundColor: '#e74c3c', // red
+    borderColor: '#e74c3c',
+  },
   secondaryButton: {
     backgroundColor: 'transparent',
     borderColor: '#00B14F',
@@ -70,6 +75,10 @@ const styles = StyleSheet.create({
   primaryDisabled: {
     backgroundColor: '#a3d3b8',
     borderColor: '#a3d3b8',
+  },
+  cancelDisabled: {
+    backgroundColor: '#f5b6b0',
+    borderColor: '#f5b6b0',
   },
   secondaryDisabled: {
     borderColor: '#a9a9a9',
@@ -83,6 +92,9 @@ const styles = StyleSheet.create({
   },
   secondaryText: {
     color: '#00B14F',
+  },
+  cancelText: {
+    color: '#FFFFFF',
   },
   disabledText: {
     color: '#FFFFFF',

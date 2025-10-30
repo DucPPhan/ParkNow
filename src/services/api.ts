@@ -801,21 +801,15 @@ const api = {
 
         /**
          * Lấy lịch sử booking của user
-         * @param status Optional filter by status
-         * @param page Page number for pagination
-         * @param limit Items per page
          */
-        getBookingHistory: async (status?: string, page: number = 1, limit: number = 10) => {
+        getActivities: async () => {
             try {
                 const token = await SecureStore.getItemAsync('userToken');
                 if (!token) {
                     return { success: false, message: 'Bạn cần đăng nhập để xem lịch sử.' };
                 }
 
-                let url = `${API_ENDPOINT}/mobile/booking/history?page=${page}&limit=${limit}`;
-                if (status) {
-                    url += `&status=${encodeURIComponent(status)}`;
-                }
+                let url = `${API_ENDPOINT}/customer-booking/activities`;
 
                 const response = await fetch(url, {
                     method: 'GET',
@@ -873,22 +867,21 @@ const api = {
         /**
          * Hủy booking
          * @param bookingId ID của booking cần hủy
-         * @param reason Lý do hủy (optional)
          */
-        cancelBooking: async (bookingId: number, reason?: string) => {
+        cancelBooking: async (bookingId: number) => {
             try {
                 const token = await SecureStore.getItemAsync('userToken');
                 if (!token) {
                     return { success: false, message: 'Bạn cần đăng nhập để hủy booking.' };
                 }
 
-                const response = await fetch(`${API_ENDPOINT}/mobile/booking/${bookingId}/cancel`, {
-                    method: 'PUT',
+                const response = await fetch(`${API_ENDPOINT}/customer-booking/cancel-booking`, {
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`,
                     },
-                    body: JSON.stringify({ reason }),
+                    body: JSON.stringify({ bookingId }),
                 });
 
                 const responseData = await logAndParseResponse(response);
@@ -903,6 +896,93 @@ const api = {
                 return { success: false, message: 'Không thể kết nối đến máy chủ.' };
             }
         },
+    },
+    /** ====================================================================
+     * RATING API ENDPOINTS
+     * ====================================================================
+     */
+    customerRatingApi: async (bookingId: number, parkingId: number, stars: number) => {
+        try {
+            const token = await SecureStore.getItemAsync('userToken');
+            if (!token) {
+                return { success: false, message: 'Bạn cần đăng nhập để đánh giá.' };
+            }
+            const response = await fetch(`${API_ENDPOINT}/rating-stars`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    bookingId,
+                    parkingId,
+                    stars,
+                }),
+            });
+            const responseData = await logAndParseResponse(response);
+
+            if (response.ok && (responseData.statusCode === 200 || responseData.statusCode === 201)) {
+                return { success: true };
+            } else {
+                return { success: false, message: responseData.message || 'Đánh giá thất bại.' };
+            }
+        } catch (error) {
+            console.error('Customer Rating API error:', error);
+            return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+        }
+    },
+
+    uploadImage: async (file: string) => {
+        try {
+            const token = await SecureStore.getItemAsync('userToken');
+            if (!token) {
+                return { success: false, message: 'Bạn cần đăng nhập để tải ảnh lên.' };
+            }
+            const formData = new FormData();
+            const filename = file.split('/').pop() || 'photo.jpg';
+            const match = /\.(\w+)$/.exec(filename);
+            const type = match ? `image/${match[1]}` : `image`;
+            formData.append('file', {
+                uri: file,
+                name: filename,
+                type,
+            } as any);
+            const response = await fetch(`${API_ENDPOINT}/upload-image`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: formData,
+            });
+            const responseData = await logAndParseResponse(response);
+                if (response.ok) {
+                    // Case: { statusCode: 200, data: { ... } }
+                    if (responseData && (responseData.statusCode === 200 || responseData.statusCode === 201) && responseData.data) {
+                        return { success: true, data: responseData.data };
+                    }
+
+                    // Case: responseData is { link: 'https://...' }
+                    if (responseData && (responseData.link || responseData.url)) {
+                        return { success: true, data: responseData };
+                    }
+
+                    // Case: responseData.data is the link or an object containing link
+                    if (responseData && responseData.data) {
+                        if (typeof responseData.data === 'string') {
+                            return { success: true, data: responseData.data };
+                        }
+                        if (responseData.data.link) {
+                            return { success: true, data: responseData.data };
+                        }
+                    }
+                }
+
+                return { success: false, message: responseData.message || 'Tải ảnh lên thất bại.' };
+        } catch (error) {
+            console.error('Upload Image API error:', error);
+            return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+        }
     },
 };
 

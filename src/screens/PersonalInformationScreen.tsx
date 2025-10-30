@@ -55,6 +55,7 @@ const PersonalInformationScreen = () => {
   const [showGenderModal, setShowGenderModal] = useState(false);
   const [showDobModal, setShowDobModal] = useState(false);
   const [tempDob, setTempDob] = useState<Date | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -120,17 +121,83 @@ const PersonalInformationScreen = () => {
   }, [navigation, isModified, handleSaveChanges]); // Effect chạy lại khi isModified hoặc handleSaveChanges thay đổi
 
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setProfile(prev => prev ? { ...prev, avatar: result.assets[0].uri } : null);
-    }
+  // Show an option sheet to choose camera or library
+  const pickImage = () => {
+    Alert.alert('Cập nhật ảnh đại diện', 'Chọn nguồn ảnh', [
+      { text: 'Chụp ảnh', onPress: async () => {
+          try {
+            const { status } = await ImagePicker.requestCameraPermissionsAsync();
+            if (status !== 'granted') {
+              Alert.alert('Quyền truy cập bị từ chối', 'Vui lòng bật quyền truy cập camera.');
+              return;
+            }
+            const result = await ImagePicker.launchCameraAsync({ allowsEditing: true, aspect: [1,1], quality: 0.8 });
+            if (!result.canceled) {
+              const localUri = result.assets[0].uri;
+              setProfile(prev => prev ? { ...prev, avatar: localUri } : null);
+              try {
+                setUploadingAvatar(true);
+                const uploadRes = await api.uploadImage(localUri);
+                if (uploadRes.success && uploadRes.data) {
+                  const link = uploadRes.data.link || (typeof uploadRes.data === 'string' ? uploadRes.data : null);
+                  if (link) {
+                    setProfile(prev => prev ? { ...prev, avatar: link } : null);
+                  } else {
+                    Alert.alert('Lỗi', 'Không nhận được đường dẫn ảnh từ server.');
+                  }
+                } else {
+                  Alert.alert('Lỗi', uploadRes.message || 'Tải ảnh lên thất bại.');
+                }
+              } catch (err) {
+                console.error('Upload avatar error', err);
+                Alert.alert('Lỗi', 'Không thể tải ảnh lên. Vui lòng thử lại.');
+              } finally {
+                setUploadingAvatar(false);
+              }
+            }
+          } catch (err) {
+            console.error('Camera error', err);
+            Alert.alert('Lỗi', 'Không thể mở camera.');
+          }
+      }},
+      { text: 'Chọn từ thư viện', onPress: async () => {
+          try {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') {
+              Alert.alert('Quyền truy cập bị từ chối', 'Vui lòng bật quyền truy cập thư viện ảnh.');
+              return;
+            }
+            const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true, aspect: [1,1], quality: 1 });
+            if (!result.canceled) {
+              const localUri = result.assets[0].uri;
+              setProfile(prev => prev ? { ...prev, avatar: localUri } : null);
+              try {
+                setUploadingAvatar(true);
+                const uploadRes = await api.uploadImage(localUri);
+                if (uploadRes.success && uploadRes.data) {
+                  const link = uploadRes.data.link || (typeof uploadRes.data === 'string' ? uploadRes.data : null);
+                  if (link) {
+                    setProfile(prev => prev ? { ...prev, avatar: link } : null);
+                  } else {
+                    Alert.alert('Lỗi', 'Không nhận được đường dẫn ảnh từ server.');
+                  }
+                } else {
+                  Alert.alert('Lỗi', uploadRes.message || 'Tải ảnh lên thất bại.');
+                }
+              } catch (err) {
+                console.error('Upload avatar error', err);
+                Alert.alert('Lỗi', 'Không thể tải ảnh lên. Vui lòng thử lại.');
+              } finally {
+                setUploadingAvatar(false);
+              }
+            }
+          } catch (err) {
+            console.error('Pick image error', err);
+            Alert.alert('Lỗi', 'Không thể chọn ảnh.');
+          }
+      }},
+      { text: 'Hủy', style: 'cancel' }
+    ]);
   };
 
   const formatDate = (dateString: string | null | undefined) => {
@@ -167,6 +234,11 @@ const PersonalInformationScreen = () => {
               source={profile.avatar ? { uri: profile.avatar } : require('../assets/image/home_banner.png')}
               style={styles.avatar}
             />
+            {uploadingAvatar && (
+              <View style={styles.avatarOverlay}>
+                <ActivityIndicator size="small" color="#fff" />
+              </View>
+            )}
             <View style={styles.cameraIcon}>
               <Ionicons name="camera" size={20} color="#fff" />
             </View>
@@ -347,6 +419,17 @@ const styles = StyleSheet.create({
       borderRadius: 15,
       borderWidth: 2,
       borderColor: '#fff'
+    },
+    avatarOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      borderRadius: 60,
+      backgroundColor: 'rgba(0,0,0,0.4)',
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     formContainer: {
       backgroundColor: '#fff',

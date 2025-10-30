@@ -269,7 +269,7 @@ const ParkingDetailScreen = () => {
           onPress={() => {
             if (!parkingData.isFull) {
               navigation.navigate('Booking', {
-                parkingId: parkingData.parkingId.toString(),
+                parkingId: parkingData.parkingId,
                 parkingName: parkingData.name
               });
             }

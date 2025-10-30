@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, Alert, Modal, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,8 +26,16 @@ const ActivityDetailScreen = () => {
   const [cancelling, setCancelling] = useState(false);
 
   const isCancelled = activity.status === 'Đã hủy';
-  const isUpcoming = activity.status === 'Đang diễn ra'; // or check if it's upcoming
+  // Use rawStatus (if present) to determine specific flows: Success, Check_In, Check_Out, Completed
+  const raw = (activity as any).rawStatus ? (activity as any).rawStatus.toString().toLowerCase() : '';
+  const isSuccess = raw === 'success'; // booking created => heading to parking, show QR to check-in
+  const isCheckedIn = raw === 'check_in' || raw === 'checkin' || raw === 'check-in'; // inside parking => show QR to check-out
+  const isCheckedOutOrCompleted = raw === 'check_out' || raw === 'checkout' || raw === 'completed' || raw === 'complete' || raw === 'finished';
+  // If user already checked in, disallow cancellation from the app UI
+  const isUpcoming = activity.status === 'Đang diễn ra' || isSuccess;
   const canCancel = isUpcoming && !isCancelled;
+
+  const [showQr, setShowQr] = useState(false);
 
   const handleCancelBooking = () => {
     Alert.alert(
@@ -42,7 +50,7 @@ const ActivityDetailScreen = () => {
             try {
               setCancelling(true);
               // Assuming activity.id is the booking ID
-              const result = await api.bookingApi.cancelBooking(parseInt(activity.id), 'Người dùng hủy');
+              const result = await api.bookingApi.cancelBooking(activity.id);
 
               if (result.success) {
                 Alert.alert('Thành công', 'Đã hủy booking thành công', [
@@ -69,6 +77,7 @@ const ActivityDetailScreen = () => {
   };
 
   const handleRebook = () => {
+    console.log(activity.parkingName)
     // Navigate to booking screen with the same parking ID
     // You might need to extract parkingId from the activity data
     navigation.navigate('Booking', {
@@ -96,17 +105,34 @@ const ActivityDetailScreen = () => {
               )}
             </View>
           </View>
+          {/* --- Trạng thái chi tiết dựa trên raw status --- */}
           <Text style={[styles.statusText, isCancelled && styles.statusTextCancelled]}>
-            {activity.status}
+            {isCancelled ? 'Đã hủy' : isCheckedOutOrCompleted ? 'Đã hoàn thành' : isCheckedIn ? 'Đã vào vị trí đỗ' : isSuccess ? 'Đang di chuyển đến bãi' : activity.status}
           </Text>
 
-          {/* --- Hiển thị Rating hoặc Thông báo Hủy --- */}
+          {/* --- Hiển thị hành động tương ứng --- */}
           {isCancelled ? (
             <View style={styles.cancelledInfoBox}>
               <Text style={styles.cancelledText}>Hoạt động này đã bị hủy.</Text>
               <Text style={styles.cancelledSubText}>Bạn không bị tính phí cho hoạt động này.</Text>
             </View>
+          ) : isSuccess ? (
+            // Success: show QR for check-in
+            <View style={{ alignItems: 'center' }}>
+              <Text style={{ marginBottom: 8 }}>Bạn đang di chuyển đến bãi. Mang mã QR để check-in khi đến nơi.</Text>
+              <Button title="Hiển thị QR để check-in" onPress={() => setShowQr(true)} />
+            </View>
+          ) : isCheckedIn ? (
+            // Checked in: show QR for check-out
+            <View style={{ alignItems: 'center' }}>
+              <Text style={{ marginBottom: 8 }}>Bạn đã vào vị trí đỗ. Hiện mã QR để check-out khi rời bãi.</Text>
+              <Button title="Hiển thị QR để check-out" onPress={() => setShowQr(true)} />
+            </View>
+          ) : isCheckedOutOrCompleted ? (
+            // Completed
+            <RatingStars rating={activity.userRating} size={28} />
           ) : (
+            // Fallback: show rating
             <RatingStars rating={activity.userRating} size={28} />
           )}
         </View>
@@ -155,35 +181,57 @@ const ActivityDetailScreen = () => {
         </View>
 
         {/* === PHẦN 4: NÚT BẤM === */}
+        {/* QR Modal */}
+        <Modal visible={showQr} transparent animationType="fade">
+          <View style={styles.qrModalOverlay}>
+            <View style={styles.qrModalContent}>
+              <Text style={{ fontWeight: 'bold', marginBottom: 12 }}>Mã QR kiểm tra</Text>
+              <View style={styles.qrPlaceholder}>
+                <Text>QR CODE</Text>
+              </View>
+              <TouchableOpacity onPress={() => setShowQr(false)} style={styles.qrCloseButton}>
+                <Text style={{ color: 'white', fontWeight: '600' }}>Đóng</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
         <View style={[styles.container, styles.buttonContainer]}>
-          {canCancel ? (
+          {isCheckedIn ? (
+            <Button
+              title="Liên hệ"
+              onPress={() => { }}
+              type="secondary"
+              style={{ flex: 1, marginRight: 10 }}
+            />
+          ) : canCancel ? (
             <>
-              <Button 
-                title="Liên hệ" 
-                onPress={() => { }} 
-                type="secondary" 
-                style={{ flex: 1, marginRight: 10 }} 
+              <Button
+                title="Liên hệ"
+                onPress={() => { }}
+                type="secondary"
+                style={{ flex: 1, marginRight: 10 }}
               />
-              <Button 
-                title="Hủy booking" 
+              <Button
+                title="Hủy booking"
                 onPress={handleCancelBooking}
                 loading={cancelling}
-                type="secondary"
-                style={{ flex: 1, marginRight: 10, backgroundColor: '#F44336' }} 
+                type="cancel"
+                style={{ flex: 1, marginRight: 10 }}
               />
             </>
           ) : (
             <>
-              <Button 
-                title="Liên hệ" 
-                onPress={() => { }} 
-                type="secondary" 
-                style={{ flex: 1, marginRight: 10 }} 
+              <Button
+                title="Liên hệ"
+                onPress={() => { }}
+                type="secondary"
+                style={{ flex: 1, marginRight: 10 }}
               />
-              <Button 
-                title="Đặt lại" 
-                onPress={handleRebook} 
-                style={{ flex: 1 }} 
+              <Button
+                title="Đặt lại"
+                onPress={handleRebook}
+                style={{ flex: 1 }}
               />
             </>
           )}
@@ -319,6 +367,34 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 16,
     marginBottom: 16,
+  },
+  qrModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  qrModalContent: {
+    width: 300,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+    alignItems: 'center',
+  },
+  qrPlaceholder: {
+    width: 200,
+    height: 200,
+    borderWidth: 2,
+    borderColor: '#ddd',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  qrCloseButton: {
+    backgroundColor: '#00B14F',
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 8,
   },
 });
 

@@ -2,6 +2,7 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { setTokenExpiredCallback } from '../services/api';
+import { resetToLogin } from '../navigation/RootNavigation';
 
 interface AuthContextType {
   isLoading: boolean;
@@ -46,10 +47,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     checkAuthStatus();
 
-    // Setup callback cho token hết hạn
+    // Setup callback cho token hết hạn: clear token and force navigate to Login
     setTokenExpiredCallback(() => {
       console.log('Token expired callback triggered');
+      // clear local state and secure store
       setUserToken(null);
+      // attempt to navigate to Login screen (reset stack)
+      try {
+        resetToLogin();
+      } catch (err) {
+        console.error('Failed to reset navigation to Login on token expiry:', err);
+      }
     });
   }, []);
 

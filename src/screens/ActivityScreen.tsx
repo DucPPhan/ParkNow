@@ -1,101 +1,13 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { StyleSheet, FlatList, SafeAreaView, View, Text, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/types';
 import ActivityCard, { Activity } from '../components/ActivityCard';
+import api from '../services/api';
 
-// 1. Thêm dữ liệu mẫu có trạng thái "Đang diễn ra"
-const ACTIVITY_DATA: Activity[] = [
-  {
-    id: '4',
-    vehicleType: 'motorcycle',
-    date: '06/10/2025',
-    time: '15:00 - 19:00',
-    status: 'Đang diễn ra',
-    vehicleInfo: 'Yamaha Exciter',
-    vehicleLicensePlate: '77L - 111.22',
-    parkingName: 'Landmark 81',
-    parkingAddress: '720A Điện Biên Phủ, Bình Thạnh',
-    slot: 'M08',
-    orderId: 'PKN1234567',
-    userName: 'Nguyễn Thị B',
-    userRating: 0,
-    startTime: '15:10',
-    endTime: '19:00',
-    paymentMethod: 'Ví ParkNow',
-    prepaidHours: '4 giờ',
-    extraHours: '0 giờ',
-    total: 60000,
-    parkingImageUrl: require('../assets/image/home_banner.png'),
-  },
-  {
-    id: '1',
-    orderId: 'PKN123456',
-    userName: 'Lê Văn A',
-    userRating: 4,
-    vehicleType: 'car',
-    date: '06/10/2025',
-    time: '14:00 - 18:30',
-    startTime: '14:05',
-    endTime: '18:25',
-    status: 'Hoàn thành',
-    vehicleInfo: 'Toyota Vios',
-    vehicleLicensePlate: '51H - 083.62',
-    parkingName: 'Takashimaya',
-    parkingAddress: '94 Nam Kỳ Khởi Nghĩa, Quận 1',
-    slot: 'A45',
-    paymentMethod: 'Ví ParkNow',
-    prepaidHours: '4 giờ',
-    extraHours: '0.5 giờ',
-    total: 50000,
-    parkingImageUrl: require('../assets/image/home_banner.png'),
-  },
-  {
-    id: '2',
-    vehicleType: 'motorcycle',
-    date: '05/10/2025',
-    time: '08:00 - 11:00',
-    status: 'Đã hủy',
-    vehicleInfo: 'Honda SH',
-    vehicleLicensePlate: '59T - 123.45',
-    parkingName: 'Bãi xe Ga Sài Gòn',
-    parkingAddress: '1 Nguyễn Thông, Q. 3',
-    slot: 'B12',
-    orderId: 'PKN1234568',
-    userName: 'Trần Văn C',
-    userRating: 0,
-    startTime: '08:00',
-    endTime: '11:00',
-    paymentMethod: 'Ví ParkNow',
-    prepaidHours: '3 giờ',
-    extraHours: '0 giờ',
-    total: 45000,
-    parkingImageUrl: require('../assets/image/home_banner.png'),
-  },
-  {
-    id: '3',
-    vehicleType: 'car',
-    date: '04/10/2025',
-    time: '19:00 - 22:00',
-    status: 'Hoàn thành',
-    vehicleInfo: 'Mazda CX-5',
-    vehicleLicensePlate: '51K - 567.89',
-    parkingName: 'Nowzone',
-    parkingAddress: '235 Nguyễn Văn Cừ, Q. 5',
-    slot: 'C03',
-    orderId: 'PKN1234569',
-    userName: 'Phạm Thị D',
-    userRating: 5,
-    startTime: '19:10',
-    endTime: '22:00',
-    paymentMethod: 'Ví ParkNow',
-    prepaidHours: '3 giờ',
-    extraHours: '0 giờ',
-    total: 75000,
-    parkingImageUrl: require('../assets/image/home_banner.png'),
-  },
-];
+// state-held activities (fetched from API)
+const initialActivities: Activity[] = [];
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -103,14 +15,108 @@ const ActivityScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   // 2. State để quản lý tab đang hoạt động
   const [activeTab, setActiveTab] = useState<'current' | 'history'>('current');
+  const [activities, setActivities] = useState<Activity[]>(initialActivities);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
+  const isFocused = useIsFocused();
+
+  // Reload activities whenever this screen is focused (covers returning after cancel)
+  useEffect(() => {
+    if (isFocused) {
+      loadActivities();
+    }
+  }, [isFocused]);
+  
   // Lọc dữ liệu dựa trên tab được chọn
   const filteredData = useMemo(() => {
     if (activeTab === 'current') {
-      return ACTIVITY_DATA.filter(item => item.status === 'Đang diễn ra');
+      // show ongoing and upcoming bookings
+      return activities.filter(item => item.status === 'Đang diễn ra' || item.status === 'Đã đặt');
     }
-    return ACTIVITY_DATA.filter(item => item.status === 'Hoàn thành' || item.status === 'Đã hủy');
-  }, [activeTab]);
+    return activities.filter(item => item.status === 'Hoàn thành' || item.status === 'Đã hủy');
+  }, [activeTab, activities]);
+
+  // Mapping helper: map API booking status to local status string used by ActivityCard
+  const mapApiStatus = (apiStatus: string) => {
+    if (!apiStatus) return 'Đã đặt';
+    const s = apiStatus.toLowerCase();
+    if (s === 'cancel') return 'Đã hủy';
+    if (s === 'check_in' || s === 'checkin' || s === 'check-in' || s === 'success') return 'Đang diễn ra';
+    if (s === 'completed' || s === 'complete' || s === 'finished') return 'Hoàn thành';
+    return 'Đã đặt';
+  };
+
+  // Parse ISO datetime to displayable date and time
+  const formatDate = (iso?: string) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+  };
+
+  const formatTimeRange = (startIso?: string, endIso?: string) => {
+    if (!startIso || !endIso) return '';
+    const s = new Date(startIso);
+    const e = new Date(endIso);
+    const fmt = (dt: Date) => `${dt.getHours().toString().padStart(2,'0')}:${dt.getMinutes().toString().padStart(2,'0')}`;
+    return `${fmt(s)} - ${fmt(e)}`;
+  };
+
+  // Fetch activities from API and map to local Activity shape
+  const loadActivities = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.bookingApi.getActivities();
+      if (res.success && Array.isArray(res.data)) {
+        const mapped: Activity[] = res.data.map((it: any) => {
+          const booking = it.bookingSearchResult || {};
+          const vehicle = it.vehicleInforSearchResult || {};
+          const parking = it.parkingSearchResult || {};
+          const slot = it.parkingSlotSearchResult || {};
+
+          const bookingId = booking.bookingId?.toString() ?? Math.random().toString(36).slice(2,9);
+          const start = booking.startTime;
+          const end = booking.endTime;
+
+          return {
+            id: bookingId,
+            orderId: `PKN${bookingId}`,
+            userName: '',
+            userRating: 0,
+            vehicleType: vehicle.trafficId === 2 ? 'car' : 'motorcycle',
+            date: formatDate(start || booking.dateBook),
+            time: formatTimeRange(start, end),
+            startTime: start ? new Date(start).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : '',
+            endTime: end ? new Date(end).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : '',
+            status: mapApiStatus(booking.status),
+            rawStatus: booking.status,
+            vehicleInfo: vehicle.vehicleName || '',
+            vehicleLicensePlate: vehicle.licensePlate || '',
+            parkingId: parking.parkingId || 0,
+            parkingName: parking.name || '',
+            parkingAddress: parking.address || '',
+            slot: (slot.name || '').trim(),
+            paymentMethod: '',
+            prepaidHours: '',
+            extraHours: '',
+            total: 0,
+          };
+        });
+        setActivities(mapped);
+      } else {
+        setError(res.message || 'Không có dữ liệu hoạt động.');
+        setActivities([]);
+      }
+    } catch (err) {
+      setError('Không thể tải hoạt động.');
+      setActivities([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -143,7 +149,7 @@ const ActivityScreen = () => {
             onPress={() => navigation.navigate('ActivityDetail', { activity: item })}
           />
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContainer}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>

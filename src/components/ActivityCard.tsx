@@ -4,8 +4,9 @@ import { Ionicons } from '@expo/vector-icons';
 
 // Định nghĩa các kiểu dữ liệu cho props
 export interface Activity {
-  id: string;
+  id: number;
   orderId: string; // Thêm
+  parkingId: number; // Thêm
   userName: string; // Thêm
   userRating: number; // Thêm
   vehicleType: 'car' | 'motorcycle';
@@ -13,7 +14,10 @@ export interface Activity {
   time: string;
   startTime: string; // Thêm
   endTime: string; // Thêm
-  status: 'Hoàn thành' | 'Đã hủy' | 'Đang diễn ra';
+  // thêm 'Đã đặt' để biểu diễn booking vừa được tạo (success) khác với hoàn thành
+  status: 'Hoàn thành' | 'Đã hủy' | 'Đang diễn ra' | 'Đã đặt';
+  // raw status string returned from backend (e.g. 'Success', 'Check_In', 'Cancel')
+  rawStatus?: string;
   vehicleInfo: string;
   vehicleLicensePlate: string;
   parkingName: string;
@@ -39,13 +43,17 @@ const StatusTag = ({ status }: { status: Activity['status'] }) => {
         ? '#d4edda' // Green
         : status === 'Đã hủy'
           ? '#f8d7da' // Red
-          : '#cce5ff', // Blue
+          : status === 'Đang diễn ra'
+            ? '#cce5ff' // Blue
+            : '#fff3cd', // Đã đặt -> yellow
     color:
       status === 'Hoàn thành'
         ? '#155724'
         : status === 'Đã hủy'
           ? '#721c24'
-          : '#004085',
+          : status === 'Đang diễn ra'
+            ? '#004085'
+            : '#856404',
   };
 
   return (

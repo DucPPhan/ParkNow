@@ -68,7 +68,7 @@ export type RootStackParamList = {
   Wallet: undefined;
   AddVehicle: undefined;
   VehicleDetail: { vehicle: Vehicle };
-  Booking: { parkingId: string; parkingName: string };
+  Booking: { parkingId: number; parkingName: string };
   RegistrationFlow: undefined;
   Notification: undefined;
   FavoriteAddress: undefined;

@@ -26,6 +26,7 @@ import AboutUsScreen from '../screens/AboutUsScreen.tsx';
 import CompleteProfileScreen from '../screens/CompleteProfileScreen';
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import { useAuth } from '../context/AuthContext';
+import { navigationRef } from './RootNavigation';
 
 const Stack = createStackNavigator<RootStackParamList>(); // Sử dụng kiểu ở đây
 
@@ -53,7 +54,7 @@ const AppNavigator = () => {
   };
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
         initialRouteName={getInitialRouteName()}
         // Cấu hình chung cho header nếu cần
