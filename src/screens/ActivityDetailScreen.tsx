@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, Alert, Modal, TouchableOpacity } from 'react-native';
+import QRCode from 'react-native-qrcode-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -187,7 +188,12 @@ const ActivityDetailScreen = () => {
             <View style={styles.qrModalContent}>
               <Text style={{ fontWeight: 'bold', marginBottom: 12 }}>Mã QR kiểm tra</Text>
               <View style={styles.qrPlaceholder}>
-                <Text>QR CODE</Text>
+                {/** Use booking id as QR payload. Fallback to displaying id as text if QR lib not available */}
+                {activity?.id ? (
+                  <QRCode value={String(activity.id)} size={200} />
+                ) : (
+                  <Text>{activity.orderId || 'NO_ID'}</Text>
+                )}
               </View>
               <TouchableOpacity onPress={() => setShowQr(false)} style={styles.qrCloseButton}>
                 <Text style={{ color: 'white', fontWeight: '600' }}>Đóng</Text>
