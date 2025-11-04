@@ -18,6 +18,7 @@ import * as SecureStore from 'expo-secure-store';
 
 import Button from '../components/Button';
 import { BookingScreenRouteProp, BookingScreenNavigationProp, Vehicle, BookingSlot } from '../navigation/types';
+import { Activity } from '../components/ActivityCard';
 import api from '../services/api';
 
 interface VehicleOption extends Vehicle {
@@ -147,7 +148,7 @@ const BookingScreen: React.FC = () => {
       const desireHour = Math.ceil(durationMs / (1000 * 60 * 60)); // Convert to hours and round up
       
       const result = await api.bookingApi.getAvailableSlots(
-        parseInt(parkingId),
+        parkingId,
         startDate.toISOString(),
         desireHour
       );
@@ -204,14 +205,14 @@ const BookingScreen: React.FC = () => {
       const desiredHour = Math.ceil(durationMs / (1000 * 60 * 60)); // Convert to hours and round up
 
       console.log('💰 Calculating pricing with params:', {
-        parkingId: parseInt(parkingId),
+        parkingId,
         startTimeBooking: startDate.toISOString(),
         desiredHour,
         trafficId
       });
 
       const result = await api.bookingApi.calculatePricing(
-        parseInt(parkingId),
+        parkingId,
         startDate.toISOString(),
         desiredHour,
         trafficId
@@ -260,7 +261,7 @@ const BookingScreen: React.FC = () => {
         }
 
         result = await api.bookingApi.createGuestBooking({
-          parkingId: parseInt(parkingId),
+          parkingId: parkingId,
           slotId: selectedSlot.id,
           guestName,
           guestPhone,
@@ -287,9 +288,9 @@ const BookingScreen: React.FC = () => {
           paymentMethod,
           vehicleInforId: parseInt(selectedVehicle!.id),
           userId: userId,
-          guestName: userProfile.fullName,
+          guestName: userProfile.name,
           guestPhone: userProfile.phone
-        }, ''); // deviceTokenMobile để trống hoặc có thể lấy từ expo-notifications
+        }); // deviceTokenMobile để trống hoặc có thể lấy từ expo-notifications
       }
 
       if (result.success) {

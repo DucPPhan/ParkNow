@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, Alert, Modal, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Image, Alert, Modal, TouchableOpacity, ActivityIndicator, Linking, Platform } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
@@ -10,6 +10,56 @@ import RatingStars from '../components/RatingStars';
 import InfoRow from '../components/InfoRow';
 import Button from '../components/Button';
 import api from '../services/api';
+
+// Interface cho booking detail response từ API
+interface BookingDetailData {
+  bookingDetails: {
+    bookingId: number;
+    startTime: string;
+    endTime: string;
+    checkinTime: string | null;
+    checkoutTime: string | null;
+    status: string;
+    guestName: string;
+    guestPhone: string;
+    totalPrice: number;
+    qrImage: string;
+    isRating: boolean;
+  };
+  user: {
+    userId: number;
+    name: string;
+    phone: string;
+  };
+  vehicleInfor: {
+    vehicleInforId: number;
+    licensePlate: string;
+    vehicleName: string;
+    color: string;
+  };
+  parkingWithBookingDetailDto: {
+    parkingId: number;
+    name: string;
+    address: string;
+    latitude: number;
+    longitude: number;
+  };
+  parkingSlotWithBookingDetailDto: {
+    parkingSlotId: number;
+    name: string;
+  };
+  floorWithBookingDetailDto: {
+    floorId: number;
+    floorName: string;
+  };
+  transactionWithBookingDetailDtos: Array<{
+    transactionId: number;
+    price: number;
+    status: string;
+    paymentMethod: string;
+    description: string;
+  }>;
+}
 
 // Component con để code gọn gàng
 const Section = ({ children, title }: { children: React.ReactNode; title?: string }) => (
@@ -22,23 +72,75 @@ const Section = ({ children, title }: { children: React.ReactNode; title?: strin
 const ActivityDetailScreen = () => {
   const route = useRoute<ActivityDetailScreenRouteProp>();
   const navigation = useNavigation<BookingScreenNavigationProp>();
-  const { activity } = route.params;
+  const { bookingId, activity } = route.params;
 
+  const [loading, setLoading] = useState(true);
+  const [bookingData, setBookingData] = useState<BookingDetailData | null>(null);
   const [cancelling, setCancelling] = useState(false);
-
-  const isCancelled = activity.status === 'Đã hủy';
-  // Use rawStatus (if present) to determine specific flows: Success, Check_In, Check_Out, Completed
-  const raw = (activity as any).rawStatus ? (activity as any).rawStatus.toString().toLowerCase() : '';
-  const isSuccess = raw === 'success'; // booking created => heading to parking, show QR to check-in
-  const isCheckedIn = raw === 'check_in' || raw === 'checkin' || raw === 'check-in'; // inside parking => show QR to check-out
-  const isCheckedOutOrCompleted = raw === 'check_out' || raw === 'checkout' || raw === 'completed' || raw === 'complete' || raw === 'finished';
-  // If user already checked in, disallow cancellation from the app UI
-  const isUpcoming = activity.status === 'Đang diễn ra' || isSuccess;
-  const canCancel = isUpcoming && !isCancelled;
-
   const [showQr, setShowQr] = useState(false);
+  const [selectedRating, setSelectedRating] = useState(0);
+  const [submittingRating, setSubmittingRating] = useState(false);
+
+  useEffect(() => {
+    if (bookingId) {
+      loadBookingDetail();
+    } else if (activity) {
+      // Fallback: sử dụng activity từ params (từ booking mới tạo)
+      setLoading(false);
+    }
+  }, [bookingId]);
+
+  const loadBookingDetail = async () => {
+    try {
+      setLoading(true);
+      const result = await api.bookingApi.getBookedBookingDetail(Number(bookingId));
+      
+      if (result.success && result.data) {
+        setBookingData(result.data);
+      } else {
+        Alert.alert('Lỗi', result.message || 'Không thể tải thông tin booking');
+        navigation.goBack();
+      }
+    } catch (error) {
+      console.error('Error loading booking detail:', error);
+      Alert.alert('Lỗi', 'Không thể tải thông tin booking');
+      navigation.goBack();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (isoString: string) => {
+    const date = new Date(isoString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const formatTime = (isoString: string) => {
+    const date = new Date(isoString);
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
+  const formatDateTime = (isoString: string) => {
+    return `${formatDate(isoString)} - ${formatTime(isoString)}`;
+  };
+
+  const getStatusInfo = (status: string) => {
+    const s = status.toLowerCase();
+    if (s === 'cancel') return { text: 'Đã hủy', color: '#e74c3c', icon: 'close-circle' as const };
+    if (s === 'success') return { text: 'Đã đặt', color: '#3498db', icon: 'checkmark-circle' as const };
+    if (s === 'check_in' || s === 'checkin') return { text: 'Đang đỗ', color: '#f39c12', icon: 'time' as const };
+    if (s === 'completed' || s === 'complete') return { text: 'Hoàn thành', color: '#2ecc71', icon: 'checkmark-circle' as const };
+    return { text: status, color: '#95a5a6', icon: 'information-circle' as const };
+  };
 
   const handleCancelBooking = () => {
+    if (!bookingData) return;
+    
     Alert.alert(
       'Xác nhận hủy',
       'Bạn có chắc chắn muốn hủy booking này không?',
@@ -50,16 +152,13 @@ const ActivityDetailScreen = () => {
           onPress: async () => {
             try {
               setCancelling(true);
-              // Assuming activity.id is the booking ID
-              const result = await api.bookingApi.cancelBooking(activity.id);
+              const result = await api.bookingApi.cancelBooking(bookingData.bookingDetails.bookingId);
 
               if (result.success) {
                 Alert.alert('Thành công', 'Đã hủy booking thành công', [
                   {
                     text: 'OK',
-                    onPress: () => {
-                      navigation.goBack();
-                    }
+                    onPress: () => navigation.goBack()
                   }
                 ]);
               } else {
@@ -77,14 +176,103 @@ const ActivityDetailScreen = () => {
     );
   };
 
+  const handleOpenMap = () => {
+    if (!bookingData) return;
+    const { latitude, longitude, address } = bookingData.parkingWithBookingDetailDto;
+    const url = Platform.OS === 'ios' 
+      ? `maps:0,0?q=${address}@${latitude},${longitude}`
+      : `geo:0,0?q=${latitude},${longitude}(${address})`;
+    Linking.openURL(url);
+  };
+
+  const handleContact = () => {
+    Alert.alert('Liên hệ', 'Chức năng liên hệ đang được phát triển');
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color="#3498db" />
+          <Text style={styles.loadingText}>Đang tải thông tin...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!bookingData && !activity) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.center}>
+          <Text>Không tìm thấy thông tin hoạt động</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Sử dụng bookingData nếu có
+  const details = bookingData?.bookingDetails;
+  const user = bookingData?.user;
+  const vehicle = bookingData?.vehicleInfor;
+  const parking = bookingData?.parkingWithBookingDetailDto;
+  const slot = bookingData?.parkingSlotWithBookingDetailDto;
+  const floor = bookingData?.floorWithBookingDetailDto;
+  const transactions = bookingData?.transactionWithBookingDetailDtos || [];
+  
+  const statusInfo = details ? getStatusInfo(details.status) : getStatusInfo(activity?.status || 'success');
+  const canCancel = details?.status.toLowerCase() === 'success';
+  const isCancelled = details?.status.toLowerCase() === 'cancel';
+  
+  // Xác định trạng thái chi tiết
+  const statusLower = details?.status.toLowerCase() || '';
+  const isSuccess = statusLower === 'success';
+  const isCheckedIn = statusLower === 'check_in' || statusLower === 'checkin';
+  const isCheckedOut = statusLower === 'check_out' || statusLower === 'checkout';
+  const isCheckedOutOrCompleted = statusLower === 'completed' || statusLower === 'complete';
+
+  // Xác định loại xe từ bookingData hoặc activity
+  const vehicleType = vehicle!.vehicleName.toLowerCase().includes('xe máy') ? 'motorcycle' : 'car';
+
   const handleRebook = () => {
-    console.log(activity.parkingName)
-    // Navigate to booking screen with the same parking ID
-    // You might need to extract parkingId from the activity data
+    if (!parking && !activity) return;
     navigation.navigate('Booking', {
-      parkingId: activity.id, // This should be the actual parking ID
-      parkingName: activity.parkingName
+      parkingId: parking?.parkingId || activity?.parkingId || 0,
+      parkingName: parking?.name || activity?.parkingName || 'Bãi đỗ xe'
     });
+  };
+
+  const handleRatingSubmit = async () => {
+    if (!bookingData || selectedRating === 0) {
+      Alert.alert('Thông báo', 'Vui lòng chọn số sao đánh giá');
+      return;
+    }
+
+    try {
+      setSubmittingRating(true);
+      const result = await api.bookingApi.submitRating(
+        bookingData.bookingDetails.bookingId,
+        bookingData.parkingWithBookingDetailDto.parkingId,
+        selectedRating
+      );
+      if (result.success) {
+        Alert.alert('Thành công', result.message || 'Đánh giá thành công!', [
+          {
+            text: 'OK',
+            onPress: () => {
+              // Refresh booking data để cập nhật isRating flag
+              loadBookingDetail();
+            }
+          }
+        ]);
+      } else {
+        Alert.alert('Lỗi', result.message || 'Đánh giá thất bại');
+      }
+    } catch (error) {
+      console.error('Error submitting rating:', error);
+      Alert.alert('Lỗi', 'Không thể gửi đánh giá');
+    } finally {
+      setSubmittingRating(false);
+    }
   };
 
   return (
@@ -94,7 +282,7 @@ const ActivityDetailScreen = () => {
         <View style={[styles.container, styles.statusContainer]}>
           <View style={styles.iconWrapper}>
             <Ionicons
-              name={activity.vehicleType === 'car' ? 'car-sport' : 'bicycle'}
+              name={vehicleType === 'car' ? 'car-sport' : 'bicycle'}
               size={50}
               color={isCancelled ? '#95a5a6' : '#3498db'} // Màu xám nếu bị hủy
             />
@@ -108,7 +296,7 @@ const ActivityDetailScreen = () => {
           </View>
           {/* --- Trạng thái chi tiết dựa trên raw status --- */}
           <Text style={[styles.statusText, isCancelled && styles.statusTextCancelled]}>
-            {isCancelled ? 'Đã hủy' : isCheckedOutOrCompleted ? 'Đã hoàn thành' : isCheckedIn ? 'Đã vào vị trí đỗ' : isSuccess ? 'Đang di chuyển đến bãi' : activity.status}
+            {isCancelled ? 'Đã hủy' : isCheckedOutOrCompleted ? 'Đã hoàn thành' : isCheckedIn ? 'Đã vào vị trí đỗ' : isSuccess ? 'Đang di chuyển đến bãi' : isCheckedOut ? 'Đã rời khỏi bãi' : details!.status}
           </Text>
 
           {/* --- Hiển thị hành động tương ứng --- */}
@@ -129,33 +317,45 @@ const ActivityDetailScreen = () => {
               <Text style={{ marginBottom: 8 }}>Bạn đã vào vị trí đỗ. Hiện mã QR để check-out khi rời bãi.</Text>
               <Button title="Hiển thị QR để check-out" onPress={() => setShowQr(true)} />
             </View>
+          ) : isCheckedOut ? (
+            // Checked out
+            <View style={{ alignItems: 'center' }}>
+              <Text style={{ marginBottom: 8 }}>Bạn đã rời khỏi bãi</Text>
+            </View>
           ) : isCheckedOutOrCompleted ? (
             // Completed
-            <RatingStars rating={activity.userRating} size={28} />
+            <Text style={styles.statusCompletedText}>
+              {details?.isRating ? 'Đã đánh giá' : 'Hoàn thành'}
+            </Text>
           ) : (
-            // Fallback: show rating
-            <RatingStars rating={activity.userRating} size={28} />
+            // Default status
+            <Text style={styles.statusCompletedText}>Đã hoàn tất</Text>
           )}
         </View>
 
         {/* === PHẦN 2 & 3: THÔNG TIN & THANH TOÁN === */}
         <View style={[styles.container, { marginTop: 10 }]}>
           <Section>
-            <InfoRow label="Mã đơn" value={activity.orderId} isCopyable />
-            <InfoRow label="Khách hàng" value={activity.userName} />
-            <InfoRow label="Biển số xe" value={activity.vehicleLicensePlate} />
-            <InfoRow label="Loại xe" value={activity.vehicleInfo} />
+            <InfoRow label="Mã đơn" value={details!.bookingId.toString()} isCopyable />
+            <InfoRow label="Khách hàng" value={details!.guestName} />
+            <InfoRow label="Biển số xe" value={vehicle!.licensePlate} />
+            <InfoRow label="Loại xe" value={vehicle!.vehicleName} />
+            {details!.checkinTime && (
+              <InfoRow label="Thời gian vào thực tế" value={formatDateTime(details!.checkinTime)} />
+            )}
+            {details!.checkoutTime && (
+              <InfoRow label="Thời gian ra thực tế" value={formatDateTime(details!.checkoutTime)} />
+            )}
           </Section>
 
           <View style={styles.divider} />
 
           <Section>
             <View style={styles.parkingInfoRow}>
-              <Image source={activity.parkingImageUrl} style={styles.parkingImage} />
               <View style={styles.parkingTextContainer}>
-                <Text style={styles.parkingName}>{activity.parkingName}</Text>
-                <Text style={styles.parkingSlot}>Vị trí: {activity.slot}</Text>
-                <Text style={styles.parkingAddress} numberOfLines={2}>{activity.parkingAddress}</Text>
+                <Text style={styles.parkingName}>{parking!.name}</Text>
+                <Text style={styles.parkingSlot}>Vị trí: {slot!.parkingSlotId}</Text>
+                <Text style={styles.parkingAddress} numberOfLines={2}>{parking!.address}</Text>
               </View>
             </View>
 
@@ -164,8 +364,8 @@ const ActivityDetailScreen = () => {
               <View style={styles.timeInfoRow}>
                 <Ionicons name="hourglass-outline" size={70} color="gray" />
                 <View style={styles.timeTextContainer}>
-                  <Text style={styles.timeLabel}>Giờ vào: {activity.startTime}</Text>
-                  <Text style={styles.timeLabel}>Giờ ra: {activity.endTime}</Text>
+                  <Text style={styles.timeLabel}>Giờ vào: {formatDateTime(details!.startTime)}</Text>
+                  <Text style={styles.timeLabel}>Giờ ra: {formatDateTime(details!.endTime)}</Text>
                 </View>
               </View>
             )}
@@ -174,10 +374,10 @@ const ActivityDetailScreen = () => {
           <View style={styles.divider} />
 
           <Section title="Thông tin thanh toán">
-            <InfoRow label="Phương thức" value={activity.paymentMethod} />
-            <InfoRow label="Giờ đặt trước" value={activity.prepaidHours} />
-            <InfoRow label="Thêm giờ" value={activity.extraHours} />
-            <InfoRow label="Tổng cộng" value={`${activity.total.toLocaleString('vi-VN')}đ`} />
+            <InfoRow label="Phương thức" value={transactions!.map((item) => item.paymentMethod).join(', ')} />
+            {/* <InfoRow label="Giờ đặt trước" value={details!.prepaidHours} />
+            <InfoRow label="Thêm giờ" value={details!.extraHours} />
+            <InfoRow label="Tổng cộng" value={`${details!.total.toLocaleString('vi-VN')}đ`} /> */}
           </Section>
         </View>
 
@@ -190,9 +390,9 @@ const ActivityDetailScreen = () => {
               <View style={styles.qrPlaceholder}>
                 {/** Use booking id as QR payload. Fallback to displaying id as text if QR lib not available */}
                 {activity?.id ? (
-                  <QRCode value={String(activity.id)} size={200} />
+                  <QRCode value={String(details!.bookingId)} size={200} />
                 ) : (
-                  <Text>{activity.orderId || 'NO_ID'}</Text>
+                  <Text>{details!.bookingId || 'NO_ID'}</Text>
                 )}
               </View>
               <TouchableOpacity onPress={() => setShowQr(false)} style={styles.qrCloseButton}>
@@ -201,6 +401,39 @@ const ActivityDetailScreen = () => {
             </View>
           </View>
         </Modal>
+
+        {/* === PHẦN: RATING (Chỉ hiện khi completed và chưa rating) === */}
+        {isCheckedOutOrCompleted && bookingData && !bookingData.bookingDetails.isRating && (
+          <View style={[styles.container, styles.ratingContainer]}>
+            <Text style={styles.ratingTitle}>Đánh giá trải nghiệm của bạn</Text>
+            <Text style={styles.ratingSubtitle}>Hãy cho chúng tôi biết cảm nhận của bạn về bãi đỗ xe</Text>
+            
+            <View style={styles.starsContainer}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <TouchableOpacity
+                  key={star}
+                  onPress={() => setSelectedRating(star)}
+                  style={styles.starButton}
+                >
+                  <Ionicons
+                    name={star <= selectedRating ? 'star' : 'star-outline'}
+                    size={40}
+                    color={star <= selectedRating ? '#f39c12' : '#bdc3c7'}
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {selectedRating > 0 && (
+              <Button
+                title="Gửi đánh giá"
+                onPress={handleRatingSubmit}
+                loading={submittingRating}
+                style={styles.submitRatingButton}
+              />
+            )}
+          </View>
+        )}
 
         <View style={[styles.container, styles.buttonContainer]}>
           {isCheckedIn ? (
@@ -255,6 +488,16 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#7f8c8d',
+  },
   container: {
     backgroundColor: 'white',
     borderRadius: 12,
@@ -291,6 +534,12 @@ const styles = StyleSheet.create({
   },
   statusTextCancelled: {
     color: '#e74c3c', // Màu đỏ cho trạng thái hủy
+  },
+  statusCompletedText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2ecc71',
+    textAlign: 'center',
   },
   // Khung thông báo hủy
   cancelledInfoBox: {
@@ -401,6 +650,36 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 8,
+  },
+  // Rating section styles
+  ratingContainer: {
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  ratingTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  ratingSubtitle: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  starsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  starButton: {
+    padding: 8,
+  },
+  submitRatingButton: {
+    width: '100%',
+    marginTop: 10,
   },
 });
 

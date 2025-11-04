@@ -15,7 +15,7 @@ export interface Activity {
   startTime: string; // Thêm
   endTime: string; // Thêm
   // thêm 'Đã đặt' để biểu diễn booking vừa được tạo (success) khác với hoàn thành
-  status: 'Hoàn thành' | 'Đã hủy' | 'Đang diễn ra' | 'Đã đặt';
+  status: 'Hoàn thành' | 'Đã hủy' | 'Đang diễn ra' | 'Đã đặt' | 'Đã rời khỏi bãi';
   // raw status string returned from backend (e.g. 'Success', 'Check_In', 'Cancel')
   rawStatus?: string;
   vehicleInfo: string;

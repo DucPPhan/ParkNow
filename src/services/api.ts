@@ -833,7 +833,39 @@ const api = {
         },
 
         /**
-         * Lấy chi tiết booking
+         * Lấy chi tiết booking đầy đủ với API mới
+         * @param bookingId ID của booking
+         */
+        getBookedBookingDetail: async (bookingId: number) => {
+            try {
+                const token = await SecureStore.getItemAsync('userToken');
+                if (!token) {
+                    return { success: false, message: 'Bạn cần đăng nhập để xem chi tiết.' };
+                }
+
+                const response = await fetch(`${API_ENDPOINT}/customer-booking/getbooked-booking-detail?BookingId=${bookingId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                const responseData = await logAndParseResponse(response);
+
+                if (response.ok && responseData.statusCode === 200) {
+                    return { success: true, data: responseData.data };
+                } else {
+                    return { success: false, message: responseData.message || 'Lấy chi tiết booking thất bại.' };
+                }
+            } catch (error) {
+                console.error('Get Booked Booking Detail API error:', error);
+                return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+            }
+        },
+
+        /**
+         * Lấy chi tiết booking (API cũ - giữ lại để tương thích)
          * @param bookingId ID của booking
          */
         getBookingDetail: async (bookingId: number) => {
@@ -896,40 +928,45 @@ const api = {
                 return { success: false, message: 'Không thể kết nối đến máy chủ.' };
             }
         },
-    },
-    /** ====================================================================
-     * RATING API ENDPOINTS
-     * ====================================================================
-     */
-    customerRatingApi: async (bookingId: number, parkingId: number, stars: number) => {
-        try {
-            const token = await SecureStore.getItemAsync('userToken');
-            if (!token) {
-                return { success: false, message: 'Bạn cần đăng nhập để đánh giá.' };
-            }
-            const response = await fetch(`${API_ENDPOINT}/rating-stars`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    bookingId,
-                    parkingId,
-                    stars,
-                }),
-            });
-            const responseData = await logAndParseResponse(response);
 
-            if (response.ok && (responseData.statusCode === 200 || responseData.statusCode === 201)) {
-                return { success: true };
-            } else {
-                return { success: false, message: responseData.message || 'Đánh giá thất bại.' };
+        /**
+         * Đánh giá booking (rating)
+         * @param bookingId ID của booking
+         * @param parkingId ID của bãi đỗ xe
+         * @param stars Số sao (0-5)
+         */
+        submitRating: async (bookingId: number, parkingId: number, stars: number) => {
+            try {
+                const token = await SecureStore.getItemAsync('userToken');
+                if (!token) {
+                    return { success: false, message: 'Bạn cần đăng nhập để đánh giá.' };
+                }
+
+                const response = await fetch(`${API_ENDPOINT}/rating-stars`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        bookingId,
+                        parkingId,
+                        stars,
+                    }),
+                });
+
+                const responseData = await logAndParseResponse(response);
+
+                if (response.ok && (responseData.statusCode === 200 || responseData.statusCode === 201)) {
+                    return { success: true, message: 'Đánh giá thành công!' };
+                } else {
+                    return { success: false, message: responseData.message || 'Đánh giá thất bại.' };
+                }
+            } catch (error) {
+                console.error('Submit Rating API error:', error);
+                return { success: false, message: 'Không thể kết nối đến máy chủ.' };
             }
-        } catch (error) {
-            console.error('Customer Rating API error:', error);
-            return { success: false, message: 'Không thể kết nối đến máy chủ.' };
-        }
+        },
     },
 
     uploadImage: async (file: string) => {

@@ -59,7 +59,7 @@ export type RootStackParamList = {
   CompleteProfile: undefined;
   ParkingList: { title: string };
   ParkingDetail: { parkingId: string; name: string };
-  ActivityDetail: { activity: Activity };
+  ActivityDetail: { activity?: Activity; bookingId?: number };
   PersonalInformation: {
     handleSave?: () => void;
     canSave?: boolean;

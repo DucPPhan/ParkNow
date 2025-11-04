@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { StyleSheet, FlatList, SafeAreaView, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, FlatList, SafeAreaView, View, Text, TouchableOpacity, RefreshControl } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/types';
@@ -17,6 +17,7 @@ const ActivityScreen = () => {
   const [activeTab, setActiveTab] = useState<'current' | 'history'>('current');
   const [activities, setActivities] = useState<Activity[]>(initialActivities);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const isFocused = useIsFocused();
@@ -32,7 +33,7 @@ const ActivityScreen = () => {
   const filteredData = useMemo(() => {
     if (activeTab === 'current') {
       // show ongoing and upcoming bookings
-      return activities.filter(item => item.status === 'Đang diễn ra' || item.status === 'Đã đặt');
+      return activities.filter(item => item.status === 'Đang diễn ra' || item.status === 'Đã rời khỏi bãi');
     }
     return activities.filter(item => item.status === 'Hoàn thành' || item.status === 'Đã hủy');
   }, [activeTab, activities]);
@@ -44,6 +45,7 @@ const ActivityScreen = () => {
     if (s === 'cancel') return 'Đã hủy';
     if (s === 'check_in' || s === 'checkin' || s === 'check-in' || s === 'success') return 'Đang diễn ra';
     if (s === 'completed' || s === 'complete' || s === 'finished') return 'Hoàn thành';
+    if (s === 'check_out' || s === 'checkout' || s === 'check-out') return 'Đã rời khỏi bãi';
     return 'Đã đặt';
   };
 
@@ -63,8 +65,12 @@ const ActivityScreen = () => {
   };
 
   // Fetch activities from API and map to local Activity shape
-  const loadActivities = async () => {
-    setLoading(true);
+  const loadActivities = async (isRefreshing: boolean = false) => {
+    if (isRefreshing) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
     setError(null);
     try {
       const res = await api.bookingApi.getActivities();
@@ -112,8 +118,16 @@ const ActivityScreen = () => {
       setError('Không thể tải hoạt động.');
       setActivities([]);
     } finally {
-      setLoading(false);
+      if (isRefreshing) {
+        setRefreshing(false);
+      } else {
+        setLoading(false);
+      }
     }
+  };
+
+  const onRefresh = () => {
+    loadActivities(true);
   };
 
   
@@ -146,11 +160,19 @@ const ActivityScreen = () => {
         renderItem={({ item }) => (
           <ActivityCard
             item={item}
-            onPress={() => navigation.navigate('ActivityDetail', { activity: item })}
+            onPress={() => navigation.navigate('ActivityDetail', { bookingId: item.id })}
           />
         )}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContainer}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#3498db']}
+            tintColor="#3498db"
+          />
+        }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>Chưa có hoạt động nào trong mục này.</Text>
