@@ -2,22 +2,60 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
+interface UpcomingBooking {
+  bookingId: number;
+  startTime: string;
+  endTime: string;
+  parkingName: string;
+  parkingAddress: string;
+  vehicleLicensePlate: string;
+  slotName: string;
+}
+
 type CurrentBookingBarProps = {
+  booking: UpcomingBooking | null;
+  onPress: () => void;
   onClose: () => void;
 };
 
-const CurrentBookingBar = ({ onClose }: CurrentBookingBarProps) => {
+const CurrentBookingBar = ({ booking, onPress, onClose }: CurrentBookingBarProps) => {
+  if (!booking) return null;
+
+  // Format time từ ISO string
+  const formatTime = (isoString: string) => {
+    const date = new Date(isoString);
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
   return (
-    <View style={styles.container}>
+    <TouchableOpacity 
+      style={styles.container}
+      onPress={onPress}
+      activeOpacity={0.9}
+    >
       <View style={styles.content}>
-        <Text style={styles.checkInTime}>Giờ vào: 14:00</Text>
-        <Text style={styles.location} numberOfLines={1}>Takashimaya - 94 Nam Kỳ Khởi Nghĩa</Text>
-        <Text style={styles.vehicle}>51H - 083.62 | A45</Text>
+        <Text style={styles.checkInTime}>
+          Giờ vào: {formatTime(booking.startTime)} - Giờ ra: {formatTime(booking.endTime)}
+        </Text>
+        <Text style={styles.location} numberOfLines={1}>
+          {booking.parkingName}
+        </Text>
+        <Text style={styles.vehicle}>
+          {booking.vehicleLicensePlate} | {booking.slotName}
+        </Text>
       </View>
-      <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+      <TouchableOpacity 
+        onPress={(e) => {
+          e.stopPropagation();
+          onClose();
+        }} 
+        style={styles.closeButton}
+      >
         <Ionicons name="close" size={22} color="#fff" />
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 };
 

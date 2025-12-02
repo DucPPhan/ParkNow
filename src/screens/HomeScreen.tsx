@@ -76,9 +76,19 @@ interface ProcessedParking {
   distance?: number; // Khoảng cách đến bãi xe (km) - chỉ có ở nearby parkings
 }
 
+interface UpcomingBooking {
+  bookingId: number;
+  startTime: string;
+  endTime: string;
+  parkingName: string;
+  parkingAddress: string;
+  vehicleLicensePlate: string;
+  slotName: string;
+}
+
 const HomeScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-  const [showBookingBar, setShowBookingBar] = useState(true);
+  const [upcomingBooking, setUpcomingBooking] = useState<UpcomingBooking | null>(null);
 
   const [featuredParkings, setFeaturedParkings] = useState<ProcessedParking[]>([]);
   const [nearbyParkings, setNearbyParkings] = useState<ProcessedParking[]>([]);
@@ -183,6 +193,36 @@ const HomeScreen = () => {
     setIsLoading(false);
   };
 
+  // Hàm lấy booking đang hoạt động
+  const fetchUpcomingBooking = async () => {
+    try {
+      const result = await api.bookingApi.getUpcomingBooking();
+      
+      if (result.success && result.data && Array.isArray(result.data) && result.data.length > 0) {
+        const bookingData = result.data[0]; // Lấy booking đầu tiên
+        const booking = bookingData.bookingSearchResult || {};
+        const vehicle = bookingData.vehicleInforSearchResult || {};
+        const parking = bookingData.parkingSearchResult || {};
+        const slot = bookingData.parkingSlotSearchResult || {};
+
+        setUpcomingBooking({
+          bookingId: booking.bookingId,
+          startTime: booking.startTime,
+          endTime: booking.endTime,
+          parkingName: parking.name || '',
+          parkingAddress: parking.address || '',
+          vehicleLicensePlate: vehicle.licensePlate || '',
+          slotName: slot.name || '',
+        });
+      } else {
+        setUpcomingBooking(null);
+      }
+    } catch (error) {
+      console.error('Error fetching upcoming booking:', error);
+      setUpcomingBooking(null);
+    }
+  };
+
   // Hàm refresh toàn bộ dữ liệu
   const onRefresh = async () => {
     setRefreshing(true);
@@ -193,10 +233,11 @@ const HomeScreen = () => {
       setCurrentLocation(location);
     }
     
-    // Reload cả 2 danh sách song song
+    // Reload cả 3 danh sách song song
     await Promise.all([
       fetchNearbyParkings(location || currentLocation),
       fetchFeaturedParkings(),
+      fetchUpcomingBooking(),
     ]);
     
     setRefreshing(false);
@@ -226,6 +267,11 @@ const HomeScreen = () => {
     fetchFeaturedParkings();
   }, []);
 
+  // Lấy upcoming booking khi mount
+  useEffect(() => {
+    fetchUpcomingBooking();
+  }, []);
+
   // Quick actions data
   const quickActions = [
     { id: '1', icon: 'search', label: 'Tìm kiếm', color: '#3498db', onPress: () => navigation.navigate('ParkingList', { title: 'Tìm kiếm' }) },
@@ -239,7 +285,7 @@ const HomeScreen = () => {
       <LocationBar navigation={navigation} />
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: showBookingBar ? 90 : 20 }}
+        contentContainerStyle={{ paddingBottom: upcomingBooking ? 90 : 20 }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -349,7 +395,15 @@ const HomeScreen = () => {
       </ScrollView>
 
       {/* Thanh đặt chỗ hiện tại */}
-      {showBookingBar && <CurrentBookingBar onClose={() => setShowBookingBar(false)} />}
+      <CurrentBookingBar 
+        booking={upcomingBooking}
+        onPress={() => {
+          if (upcomingBooking) {
+            navigation.navigate('ActivityDetail', { bookingId: upcomingBooking.bookingId });
+          }
+        }}
+        onClose={() => setUpcomingBooking(null)}
+      />
     </SafeAreaView>
   );
 };

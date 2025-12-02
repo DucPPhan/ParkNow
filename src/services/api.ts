@@ -833,6 +833,37 @@ const api = {
         },
 
         /**
+         * Lấy booking đang hoạt động (upcoming)
+         */
+        getUpcomingBooking: async () => {
+            try {
+                const token = await SecureStore.getItemAsync('userToken');
+                if (!token) {
+                    return { success: false, message: 'Bạn cần đăng nhập.' };
+                }
+
+                const response = await fetch(`${API_ENDPOINT}/customer-booking/upcomming`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                const responseData = await logAndParseResponse(response);
+
+                if (response.ok && (responseData.statusCode === 200 || responseData.statusCode === 201)) {
+                    return { success: true, data: responseData.data };
+                } else {
+                    return { success: false, message: responseData.message || 'Không có booking đang hoạt động.' };
+                }
+            } catch (error) {
+                console.error('Get Upcoming Booking API error:', error);
+                return { success: false, message: 'Không thể kết nối đến máy chủ.' };
+            }
+        },
+
+        /**
          * Lấy chi tiết booking đầy đủ với API mới
          * @param bookingId ID của booking
          */
