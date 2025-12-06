@@ -13,5 +13,11 @@
         "photosPermission": "Ứng dụng cần truy cập thư viện ảnh để bạn có thể chọn ảnh đại diện."
       }
     ]
-  ]
+  ],
+  "android": {
+    "permissions": [
+      "android.permission.RECORD_AUDIO"
+    ],
+    "package": "com.duckies.parknow"
+  }
 }
